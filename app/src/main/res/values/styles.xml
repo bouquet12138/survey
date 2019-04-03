@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textViewStyle">@style/MyTextStyle</item>
+    </style>
+
+    <style name="MyTextStyle">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">#333</item>
+    </style>
+
+    <style name="DialogBackgroundNull" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item> <!--无边框-->
+        <item name="android:windowIsFloating">true</item><!--悬浮在父界面之上-->
+        <item name="android:windowIsTranslucent">true</item><!--允许呈现半透明状态-->
+        <item name="android:windowNoTitle">true</item><!--无标题-->
+        <item name="android:windowBackground">@color/trans_color</item> <!--透明背景-->
+        <item name="android:backgroundDimEnabled">true</item> <!-- 允许周围模糊 -->
+        <item name="android:backgroundDimAmount">0.6</item><!--设置模糊灰度-->
+    </style>
+
+	<style name="style_title">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:background">@color/colorPrimary</item>
+		<item name="android:gravity">center</item>
+		<item name="android:padding">10dp</item>
+		<item name="android:textColor">#fff</item>
+		<item name="android:textSize">25dp</item>
+	</style>
+
+</resources>
