@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/appBackColor"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!--头部-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/left"
+        android:gravity="center_vertical"
+        android:text="  摄像头信息"
+        android:textColor="#000"
+        android:textSize="23dp" />
+
+    <!--安装方式-->
+    <LinearLayout style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="安装方式" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/poleRadio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="立杆安装" />
+
+            <RadioButton
+                android:id="@+id/wallRadio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="壁挂安装" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <!--立杆高度横臂数量-->
+    <LinearLayout style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+
+            style="@style/style_point_info_text"
+            android:text="立杆高度" />
+
+        <EditText
+            android:id="@+id/poleHighEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="米" />
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+
+            style="@style/style_point_info_text"
+            android:text="横臂数量" />
+
+        <EditText
+            android:id="@+id/crossArmNumEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+    <!--机枪覆盖方向-->
+    <LinearLayout style="@style/style_survey_linear">
+
+        <TextView
+            style="@style/style_point_info_text"
+            android:text="枪机覆盖\n方向1" />
+
+        <EditText
+            android:id="@+id/dirEdit1"
+            style="@style/style_camera_info_edit" />
+
+
+        <TextView
+            style="@style/style_point_info_text"
+            android:layout_marginLeft="20dp"
+            android:text="枪机覆盖\n方向2" />
+
+        <EditText
+            android:id="@+id/dirEdit2"
+            style="@style/style_camera_info_edit" />
+
+    </LinearLayout>
+
+    <!--人脸识别-->
+    <LinearLayout style="@style/style_survey_linear">
+
+        <TextView
+
+            style="@style/style_point_info_text"
+            android:text="人脸识别\n监控头" />
+
+        <EditText
+            android:id="@+id/faceRecNumEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="个" />
+
+        <TextView
+            style="@style/style_point_info_text"
+            android:text="人脸补光灯" />
+
+        <EditText
+            android:id="@+id/faceLightNumEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="个" />
+
+    </LinearLayout>
+
+    <!--监控数-->
+    <LinearLayout style="@style/style_survey_linear">
+
+        <TextView
+
+            style="@style/style_point_info_text"
+            android:text="车牌识别\n监控头" />
+
+        <EditText
+            android:id="@+id/carNumRecNumEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="个" />
+
+        <TextView
+            style="@style/style_point_info_text"
+            android:text="环球监控头" />
+
+        <EditText
+            android:id="@+id/globalNumEdit"
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="个" />
+
+    </LinearLayout>
+
+    <!--横线-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="30dp"
+        android:background="#aaa" />
+
+</LinearLayout>

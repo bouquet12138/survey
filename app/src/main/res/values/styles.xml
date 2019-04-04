@@ -10,7 +10,7 @@
     </style>
 
     <style name="MyTextStyle">
-        <item name="android:textSize">20dp</item>
+        <item name="android:textSize">17dp</item>
         <item name="android:textColor">#333</item>
     </style>
 
@@ -24,21 +24,51 @@
         <item name="android:backgroundDimAmount">0.6</item><!--设置模糊灰度-->
     </style>
 
-	<style name="style_title">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:background">@color/colorPrimary</item>
-		<item name="android:gravity">center</item>
-		<item name="android:padding">10dp</item>
-		<item name="android:textColor">#fff</item>
-		<item name="android:textSize">25dp</item>
-	</style>
 
-	<style name="style_back_image">
-		<item name="android:layout_width">50dp</item>
-		<item name="android:layout_height">50dp</item>
-		<item name="android:padding">5dp</item>
-		<item name="android:src">@drawable/back</item>
-	</style>
+    <style name="style_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">25dp</item>
+    </style>
+
+    <style name="style_back_image">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:src">@drawable/back</item>
+    </style>
+
+    <style name="style_point_info_edit">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:background">@drawable/selector_input</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="style_point_info_text">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">right</item>
+    </style>
+
+
+    <style name="style_survey_linear">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">23dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <!--摄像信息-->
+    <style name="style_camera_info_edit">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:background">@drawable/selector_input</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:maxLines">1</item>
+    </style>
 
 </resources>

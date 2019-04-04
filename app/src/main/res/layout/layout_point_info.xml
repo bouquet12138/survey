@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/appBackColor"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!--头部-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/left"
+            android:gravity="center_vertical"
+            android:text="  点位信息"
+            android:textColor="#000"
+            android:textSize="23dp" />
+
+        <TextView
+            android:id="@+id/locText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableRight="@drawable/loc"
+            android:gravity="center_vertical"
+            android:text="点击获取定位 "
+            android:textColor="@color/darkColor" />
+
+    </LinearLayout>
+
+    <!--编号-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="编号" />
+
+        <EditText
+            android:id="@+id/numberEdit"
+            style="@style/style_point_info_edit" />
+
+    </LinearLayout>
+
+    <!--点位名称-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="点位名称" />
+
+        <EditText
+            android:id="@+id/nameEdit"
+            style="@style/style_point_info_edit" />
+
+    </LinearLayout>
+
+    <!--详细地址-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="详细地址" />
+
+        <EditText
+            android:id="@+id/detailAddressEdit"
+            style="@style/style_point_info_edit" />
+
+    </LinearLayout>
+
+    <!--经度-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="经度" />
+
+        <EditText
+            android:id="@+id/longitude"
+            style="@style/style_point_info_edit" />
+
+    </LinearLayout>
+
+    <!--纬度-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="纬度" />
+
+        <EditText
+            android:id="@+id/latitudeEdit"
+            style="@style/style_point_info_edit" />
+
+    </LinearLayout>
+
+    <!--所属街道-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="所属街道" />
+
+        <Spinner
+            android:id="@+id/streetSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp">
+
+        </Spinner>
+
+    </LinearLayout>
+
+    <!--派出所-->
+    <LinearLayout
+        style="@style/style_survey_linear">
+
+        <top.systemsec.survey.custom_view.MyHintTextView
+            style="@style/style_point_info_text"
+            android:text="派出所" />
+
+        <Spinner
+            android:id="@+id/policeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp">
+
+        </Spinner>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="30dp"
+        android:background="#aaa" />
+
+</LinearLayout>

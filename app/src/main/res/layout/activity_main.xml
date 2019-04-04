@@ -9,7 +9,9 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:layout_centerVertical="true"
             style="@style/style_title"
+            android:layout_marginLeft="20dp"
             android:text="勘察软件" />
 
         <ImageView

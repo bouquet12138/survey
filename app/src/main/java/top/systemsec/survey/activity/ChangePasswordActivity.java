@@ -9,13 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBaseActivity;
 
 public class ChangePasswordActivity extends MVPBaseActivity implements View.OnClickListener {
 
+    private boolean mOldPW, mNewPW, mConfirmPW;
     private EditText mOldPasswordEdit;
     private TextView mOldPasswordHint;
     private EditText mNewPasswordEdit;
@@ -24,6 +24,8 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
     private TextView mConfirmPasswordHint;
     private Button mSubmitBt;
     private ImageView mBackImage;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,32 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
     }
 
     private void initListener() {
+
+        mOldPasswordEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //TODO:旧密码确认
+                String str = s + "";
+                if (TextUtils.isEmpty(str)) {
+                    mOldPW = false;//旧密码错误
+                } else {
+                    mOldPW = true;//旧密码正确
+                }
+
+                mSubmitBt.setEnabled(mOldPW && mNewPW && mConfirmPW);//提交按钮是否可用
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         mNewPasswordEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -53,14 +81,18 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String str = s + "";
+                String password1 = s + "";
+                judgePassword();//判断前后密码
 
-                if (!TextUtils.isEmpty(str) && (str.length() < 6 || str.length() > 10)) {
+                if (TextUtils.isEmpty(password1) || password1.length() < 6 || password1.length() > 10) {
                     mNewPasswordHint.setText("新密码不符合要求！");
+                    mNewPW = false;
                 } else {
                     mNewPasswordHint.setText("");
+                    mNewPW = true;
                 }
 
+                mSubmitBt.setEnabled(mOldPW && mNewPW && mConfirmPW);//提交按钮是否可用
             }
 
             @Override
@@ -77,15 +109,16 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String password1 = mNewPasswordEdit.getText().toString();
-                String password2 = s + "";
 
-                if (!TextUtils.isEmpty(password1) && !TextUtils.isEmpty(password2) && !password1.equals(password2)) {
-                    mConfirmPasswordHint.setText("两次密码输入不一致！");
-                } else {
-                    mConfirmPasswordHint.setText("");
+                String str = s + "";
+                if (TextUtils.isEmpty(str)) {
+                    mConfirmPasswordHint.setText("请确认密码");
+                    mConfirmPW = false;
                 }
 
+                judgePassword();//判断一下密码
+
+                mSubmitBt.setEnabled(mOldPW && mNewPW && mConfirmPW);//提交按钮是否可用
             }
 
             @Override
@@ -97,6 +130,27 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
         mSubmitBt.setOnClickListener(this);
         mBackImage.setOnClickListener(this);
 
+    }
+
+    /**
+     * 判断前后密码是否一致
+     *
+     * @return
+     */
+    public void judgePassword() {
+        String password1 = mNewPasswordEdit.getText().toString();
+        String password2 = mConfirmPasswordEdit.getText().toString();
+
+        if (TextUtils.isEmpty(password1) || TextUtils.isEmpty(password2))//不做判断
+            return;
+
+        if (!password1.equals(password2)) {
+            mConfirmPasswordHint.setText("两次密码输入不一致！");
+            mConfirmPW = false;//确认密码错误
+        } else {
+            mConfirmPasswordHint.setText("");
+            mConfirmPW = true;//密码确认成功
+        }
     }
 
     @Override
@@ -119,21 +173,6 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
         String newPassword = mNewPasswordEdit.getText().toString();
         String confirmPassword = mConfirmPasswordEdit.getText().toString();
 
-        if (TextUtils.isEmpty(oldPassword) || TextUtils.isEmpty(newPassword) || TextUtils.isEmpty(confirmPassword)) {
-            Toast.makeText(this, "输入框不能为空", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        //TODO：确定旧密码部分
-
-        if (newPassword.length() < 6 || newPassword.length() > 10) {
-            Toast.makeText(this, "密码长度不符合规范", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (!confirmPassword.equals(newPassword)) {
-            Toast.makeText(this, "两次输入的密码不一致", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        //TODO:直接提交即可
     }
 }

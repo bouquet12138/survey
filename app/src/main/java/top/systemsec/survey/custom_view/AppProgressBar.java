@@ -31,7 +31,7 @@ public class AppProgressBar extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.app_progress);
+        setContentView(R.layout.dialog_app_progress);
 
         Window window = getWindow();
         WindowManager.LayoutParams layoutParams = window.getAttributes();
@@ -46,7 +46,6 @@ public class AppProgressBar extends Dialog {
         hintText.setText(hintStr);
         setCancelable(false);//不能取消
 
-        fullScreen();
     }
 
     /**
