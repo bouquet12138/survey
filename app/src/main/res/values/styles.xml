@@ -53,6 +53,13 @@
         <item name="android:gravity">right</item>
     </style>
 
+    <style name="style_camera_info_text">
+        <item name="android:layout_width">90dp</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">right</item>
+    </style>
+
 
     <style name="style_survey_linear">
         <item name="android:layout_width">match_parent</item>
@@ -63,7 +70,8 @@
 
     <!--摄像信息-->
     <style name="style_camera_info_edit">
-        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:background">@drawable/selector_input</item>

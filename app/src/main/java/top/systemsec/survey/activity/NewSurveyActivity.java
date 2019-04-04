@@ -1,7 +1,7 @@
 package top.systemsec.survey.activity;
 
 import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -9,40 +9,31 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
-import com.zhihu.matisse.internal.entity.Item;
-import com.zhihu.matisse.internal.entity.UncapableCause;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
-import java.util.Set;
 
+import java.util.List;
+
+import top.systemsec.survey.GifSizeFilter;
+import top.systemsec.survey.Glide4Engine;
 import top.systemsec.survey.R;
+import top.systemsec.survey.view.NewSurveyView;
 
-public class NewSurveyActivity extends AppCompatActivity implements View.OnClickListener {
+
+public class NewSurveyActivity extends AppCompatActivity {
+
+    private static final String TAG = "NewSurveyActivity";
 
     private final int REQUEST_CODE_CHOOSE = 0;//选择图片
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;//请求读取本地图片
 
-    private ImageView mBackImg;//返回按钮
-    private TextView mLocText;
-    private EditText mNumberEdit;
-    private EditText mNameEdit;
-    private EditText mDetailAddressEdit;
-    private EditText mLongitude;
-    private EditText mLatitudeEdit;
-    private Spinner mStreetSpinner;
-    private Spinner mPoliceSpinner;
-
-    private ImageView mAddImage;//添加图片
+    private NewSurveyView mNewSurveyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,48 +47,19 @@ public class NewSurveyActivity extends AppCompatActivity implements View.OnClick
      * 初始化view
      */
     private void initView() {
-
-        mBackImg = findViewById(R.id.backImage);//返回按钮
-        mLocText = findViewById(R.id.locText);//定位的
-
-        mNumberEdit = findViewById(R.id.numberEdit);
-        mNameEdit = findViewById(R.id.nameEdit);
-        mDetailAddressEdit = findViewById(R.id.detailAddressEdit);
-        mLongitude = findViewById(R.id.longitude);
-        mLatitudeEdit = findViewById(R.id.latitudeEdit);
-        mStreetSpinner = findViewById(R.id.streetSpinner);
-        mPoliceSpinner = findViewById(R.id.policeSpinner);
-
-        mAddImage = findViewById(R.id.addImage);//TODO:等着删去
-
+        mNewSurveyView = findViewById(R.id.newSurveyView);//新勘察
+        mNewSurveyView.initView();//初始化view
     }
 
     /**
      * 初始化监听
      */
     private void initListener() {
-        mLocText.setOnClickListener(this);//获取定位
-        mBackImg.setOnClickListener(this);//返回按钮监听
-        mAddImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //如果还没有获取到读取本地文件的权限
-                if (ContextCompat.checkSelfPermission(NewSurveyActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                    // 如果用户已经拒绝了当前权限,shouldShowRequestPermissionRationale返回true，此时我们需要进行必要的解释和处理
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        Toast.makeText(NewSurveyActivity.this, "用户拒绝了权限，不能读取本地图片", Toast.LENGTH_SHORT).show();
-                    } else {
-                        //请求权限
-                        ActivityCompat.requestPermissions(NewSurveyActivity.this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-                    }
-                } else {
-                    selectImage();//从本地选择图片
-                }
+        mNewSurveyView.initClickListener((v) -> {
+            switch (v.getId()) {
+                case R.id.backImage:
+                    finish();//返回销毁
+                    break;
             }
         });
     }
@@ -121,36 +83,56 @@ public class NewSurveyActivity extends AppCompatActivity implements View.OnClick
 
 
     /**
+     * 从相册选择图片 权限
+     */
+    private void selectImageAuthor() {
+        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // 如果用户已经拒绝了当前权限,shouldShowRequestPermissionRationale返回true，此时我们需要进行必要的解释和处理
+            if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Toast.makeText(NewSurveyActivity.this, "用户拒绝了权限，不能读取本地图片", Toast.LENGTH_SHORT).show();
+            } else {
+                //请求权限
+                ActivityCompat.requestPermissions(NewSurveyActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+            }
+        } else {
+            selectImage();//从本地选择图片
+        }
+    }
+
+    /**
      * 从相册选择图片
      */
     public void selectImage() {
         Matisse.from(NewSurveyActivity.this)
-                .choose(MimeType.allOf())
+                .choose(MimeType.ofImage(), false)
                 .countable(true)
+                .capture(true)
+                .captureStrategy(
+                        new CaptureStrategy(true, "com.example.survey.sample.fileprovider"))
                 .maxSelectable(8)
-                .addFilter(new Filter() {
-                    @Override
-                    protected Set<MimeType> constraintTypes() {
-                        return null;
-                    }
-
-                    @Override
-                    public UncapableCause filter(Context context, Item item) {
-                        return null;
-                    }
-                })
-                .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
+                .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                .gridExpectedSize(
+                        getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 .thumbnailScale(0.85f)
-                .imageEngine(new GlideEngine())
+                .imageEngine(new Glide4Engine())
+                .originalEnable(true)
+                .maxOriginalSize(10)
                 .forResult(REQUEST_CODE_CHOOSE);
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.backImage:
-                finish();
-                break;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
+
+            List<String> pathList = Matisse.obtainPathResult(data);
+            Log.d(TAG, "onActivityResult: pathList " + pathList);
         }
     }
+
 }
