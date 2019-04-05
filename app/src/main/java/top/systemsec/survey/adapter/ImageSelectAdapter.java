@@ -21,16 +21,31 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
 
     private List<String> mImagePaths;//图片路径
     private Context mContext;
+
+    private int mIndex;//适配器的索引
+    private String mImageTitle;//这一组图片的名称
     private int mMaxImageNum;//最大图片数
+
+    /**
+     * 构造器
+     *
+     * @param imagePaths
+     * @param context
+     * @param index
+     * @param maxImageNum
+     */
+    public ImageSelectAdapter(List<String> imagePaths, Context context, String imageTitle, int index, int maxImageNum) {
+        mImagePaths = imagePaths;
+        mContext = context;
+        mImageTitle = imageTitle;
+        mIndex = index;
+        mMaxImageNum = maxImageNum;
+    }
 
     /**
      * 构造方法
      */
-    public ImageSelectAdapter(List<String> imagePaths, Context context, int maxImageNum) {
-        mImagePaths = imagePaths;
-        mContext = context;
-        mMaxImageNum = maxImageNum;
-    }
+
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -53,10 +68,16 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
                 mImagePaths.remove(position);
                 notifyDataSetChanged();//唤醒数据更新
             });
+
+            holder.imageView.setOnClickListener((v) -> {
+                if (mOnImageClickListener != null)
+                    mOnImageClickListener.onClick(mIndex, mImageTitle, mImagePaths, position);//图片点击监听
+            });
+
         } else {
             holder.addImage.setOnClickListener((v) -> {
                 if (mOnAddImageListener != null)
-                    mOnAddImageListener.add(mMaxImageNum - mImagePaths.size());//可以添加的图片数
+                    mOnAddImageListener.add(mIndex, mMaxImageNum - mImagePaths.size());//可以添加的图片数
             });
         }
 
@@ -114,12 +135,30 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      * 添加图片的监听
      */
     public interface OnAddImageListener {
-        void add(int num);
+        void add(int index, int maxNum);
     }
 
     private OnAddImageListener mOnAddImageListener;//添加图片监听
 
     public void setOnAddImageListener(OnAddImageListener onAddImageListener) {
         mOnAddImageListener = onAddImageListener;
+    }
+
+    /**
+     * 图片点击监听
+     */
+    public interface OnImageClickListener {
+        void onClick(int index, String imageTitle, List<String> imgPath, int imgIndex);
+    }
+
+    private OnImageClickListener mOnImageClickListener;
+
+    /**
+     * 设置图片点击监听
+     *
+     * @param onImageClickListener
+     */
+    public void setOnImageClickListener(OnImageClickListener onImageClickListener) {
+        mOnImageClickListener = onImageClickListener;
     }
 }

@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 
-import top.systemsec.survey.custom_view.AppProgressBar;
+import top.systemsec.survey.dialog.AppProgressBar;
 
 /**
  * 所有需要mvp设计模式的activity的基类

@@ -26,7 +26,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/envImgRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -58,7 +59,8 @@
             android:id="@+id/overallViewRecyclerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="false">
 
         </android.support.v7.widget.RecyclerView>
 
@@ -66,7 +68,8 @@
             android:id="@+id/closeShotRecyclerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="false">
 
         </android.support.v7.widget.RecyclerView>
 
@@ -101,7 +104,8 @@
             android:id="@+id/gpsImgRecyclerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="false">
 
         </android.support.v7.widget.RecyclerView>
 
@@ -109,7 +113,8 @@
             android:id="@+id/sceneImgRecyclerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="false">
 
         </android.support.v7.widget.RecyclerView>
 

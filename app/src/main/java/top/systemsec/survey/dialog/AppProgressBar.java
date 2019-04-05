@@ -1,4 +1,4 @@
-package top.systemsec.survey.custom_view;
+package top.systemsec.survey.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

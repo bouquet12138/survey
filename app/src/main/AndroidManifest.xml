@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SiteManageActivity"></activity>
+        <activity android:name=".activity.PictureViewActivity"></activity>
+        <activity android:name=".activity.SiteManageActivity" />
         <activity android:name=".activity.TempStorageActivity" />
         <activity android:name=".activity.NewSurveyActivity" />
         <activity android:name=".activity.ChangePasswordActivity" />
@@ -23,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".activity.MainActivity" />
 
         <provider
@@ -35,7 +35,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths_public" />
         </provider>
-
     </application>
 
 </manifest>

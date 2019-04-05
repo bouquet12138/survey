@@ -2,6 +2,7 @@ package top.systemsec.survey.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.widget.Button;
@@ -12,7 +13,10 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.List;
+
 import top.systemsec.survey.R;
+import top.systemsec.survey.adapter.ImageSelectAdapter;
 
 public class NewSurveyView extends LinearLayout {
 
@@ -59,6 +63,12 @@ public class NewSurveyView extends LinearLayout {
 
     private Button mTempStorageBt;//暂存按钮
     private Button mSubmitBt;//提交按钮
+
+    private ImageSelectAdapter mImageSelectAdapter;
+    private ImageSelectAdapter mImageSelectAdapter1;
+    private ImageSelectAdapter mImageSelectAdapter2;
+    private ImageSelectAdapter mImageSelectAdapter3;
+    private ImageSelectAdapter mImageSelectAdapter4;
 
     public NewSurveyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -111,6 +121,95 @@ public class NewSurveyView extends LinearLayout {
         mBackImage.setOnClickListener(onClickListener);
         mSubmitBt.setOnClickListener(onClickListener);
         mTempStorageBt.setOnClickListener(onClickListener);
+    }
+
+    /**
+     * 初始化图片适配器
+     */
+    public void initImageAdapter(List<String> imagePaths) {
+        mImageSelectAdapter = new ImageSelectAdapter(imagePaths, getContext(), "环境照", 0, 8);
+        mEnvImgRecyclerView.setAdapter(mImageSelectAdapter);
+        mEnvImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+    }
+
+    /**
+     * 初始化全景照图片适配器
+     */
+    public void initImageAdapter1(List<String> imagePaths) {
+        mImageSelectAdapter1 = new ImageSelectAdapter(imagePaths, getContext(), "全景照", 1, 2);
+        mOverallViewRecyclerView.setAdapter(mImageSelectAdapter1);
+        mOverallViewRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+    }
+
+    /**
+     * 初始化近照图片适配器
+     */
+    public void initImageAdapter2(List<String> imagePaths) {
+        mImageSelectAdapter2 = new ImageSelectAdapter(imagePaths, getContext(), "近景照", 2, 2);
+        mCloseShotRecyclerView.setAdapter(mImageSelectAdapter2);
+        mCloseShotRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+    }
+
+    /**
+     * 初始化gps图片适配器
+     */
+    public void initImageAdapter3(List<String> imagePaths) {
+        mImageSelectAdapter3 = new ImageSelectAdapter(imagePaths, getContext(), "gps照", 3, 1);
+        mGpsImgRecyclerView.setAdapter(mImageSelectAdapter3);
+        mGpsImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+    }
+
+    /**
+     * 初始化现场照图片适配器
+     */
+    public void initImageAdapter4(List<String> imagePaths) {
+        mImageSelectAdapter4 = new ImageSelectAdapter(imagePaths, getContext(), "现场画面照", 4, 1);
+        mSceneImgRecyclerView.setAdapter(mImageSelectAdapter4);
+        mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+    }
+
+    /**
+     * 初始化添加图片的监听
+     *
+     * @param onAddImageListener
+     */
+    public void initAddImageListener(ImageSelectAdapter.OnAddImageListener onAddImageListener) {
+        mImageSelectAdapter.setOnAddImageListener(onAddImageListener);
+        mImageSelectAdapter1.setOnAddImageListener(onAddImageListener);
+        mImageSelectAdapter2.setOnAddImageListener(onAddImageListener);
+        mImageSelectAdapter3.setOnAddImageListener(onAddImageListener);
+        mImageSelectAdapter4.setOnAddImageListener(onAddImageListener);
+    }
+
+    /**
+     * 查看图片的监听
+     */
+    public void initWatchImageListener(ImageSelectAdapter.OnImageClickListener onImageClickListener) {
+        mImageSelectAdapter.setOnImageClickListener(onImageClickListener);
+        mImageSelectAdapter1.setOnImageClickListener(onImageClickListener);
+        mImageSelectAdapter2.setOnImageClickListener(onImageClickListener);
+        mImageSelectAdapter3.setOnImageClickListener(onImageClickListener);
+        mImageSelectAdapter4.setOnImageClickListener(onImageClickListener);
+    }
+
+    public void notifyImgAdapter() {
+        mImageSelectAdapter.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    public void notifyImgAdapter1() {
+        mImageSelectAdapter1.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    public void notifyImgAdapter2() {
+        mImageSelectAdapter2.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    public void notifyImgAdapter3() {
+        mImageSelectAdapter3.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    public void notifyImgAdapter4() {
+        mImageSelectAdapter4.notifyDataSetChanged();//唤醒数据更新
     }
 
 }

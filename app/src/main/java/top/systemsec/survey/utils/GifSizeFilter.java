@@ -1,4 +1,4 @@
-package top.systemsec.survey;
+package top.systemsec.survey.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,6 +12,8 @@ import com.zhihu.matisse.internal.utils.PhotoMetadataUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import top.systemsec.survey.R;
 
 public class GifSizeFilter extends Filter {
 

@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.zhihu.matisse.Matisse;
@@ -18,10 +17,12 @@ import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-import top.systemsec.survey.GifSizeFilter;
-import top.systemsec.survey.Glide4Engine;
+import top.systemsec.survey.utils.GifSizeFilter;
+import top.systemsec.survey.utils.Glide4Engine;
 import top.systemsec.survey.R;
 import top.systemsec.survey.view.NewSurveyView;
 
@@ -31,15 +32,28 @@ public class NewSurveyActivity extends AppCompatActivity {
     private static final String TAG = "NewSurveyActivity";
 
     private final int REQUEST_CODE_CHOOSE = 0;//选择图片
+    private final int VIEW_PIC = 1;//查看图片
+
+
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;//请求读取本地图片
 
     private NewSurveyView mNewSurveyView;
+
+    private List<String> mImagePaths = new ArrayList<>();
+    private List<String> mImagePaths1 = new ArrayList<>();
+    private List<String> mImagePaths2 = new ArrayList<>();
+    private List<String> mImagePaths3 = new ArrayList<>();
+    private List<String> mImagePaths4 = new ArrayList<>();
+
+    private int mNowAddImgIndex, mMaxImgNum;//当前图片索引 最大图片数
+    private int mNowWatchImgIndex;//当前查看图片的索引
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_survey);
         initView();
+        initAdapter();
         initListener();
     }
 
@@ -49,6 +63,17 @@ public class NewSurveyActivity extends AppCompatActivity {
     private void initView() {
         mNewSurveyView = findViewById(R.id.newSurveyView);//新勘察
         mNewSurveyView.initView();//初始化view
+    }
+
+    /**
+     * 初始化适配器
+     */
+    private void initAdapter() {
+        mNewSurveyView.initImageAdapter(mImagePaths);
+        mNewSurveyView.initImageAdapter1(mImagePaths1);
+        mNewSurveyView.initImageAdapter2(mImagePaths2);
+        mNewSurveyView.initImageAdapter3(mImagePaths3);
+        mNewSurveyView.initImageAdapter4(mImagePaths4);
     }
 
     /**
@@ -62,6 +87,31 @@ public class NewSurveyActivity extends AppCompatActivity {
                     break;
             }
         });
+
+        /**
+         * 添加图片监听
+         */
+        mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
+            mNowAddImgIndex = index;
+            mMaxImgNum = maxNum;
+            if (mMaxImgNum >= 0)
+                selectImageAuthor();//从相册选择图片
+        });
+
+        mNewSurveyView.initWatchImageListener((int index, String imageName, List<String> imageList, int imgIndex) -> {
+            mNowWatchImgIndex = index;//当前查看的图片索引
+
+            Intent intent = new Intent(NewSurveyActivity.this, PictureViewActivity.class);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("imageName", imageName);
+            bundle.putSerializable("imageList", (Serializable) imageList);
+            bundle.putInt("imgIndex", imgIndex);
+            intent.putExtras(bundle);
+
+            startActivityForResult(intent, VIEW_PIC);//启动活动
+        });
+
     }
 
     /**
@@ -113,7 +163,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                 .capture(true)
                 .captureStrategy(
                         new CaptureStrategy(true, "com.example.survey.sample.fileprovider"))
-                .maxSelectable(8)
+                .maxSelectable(mMaxImgNum)
                 .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
                 .gridExpectedSize(
                         getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
@@ -129,9 +179,35 @@ public class NewSurveyActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-
             List<String> pathList = Matisse.obtainPathResult(data);
-            Log.d(TAG, "onActivityResult: pathList " + pathList);
+
+            switch (mNowAddImgIndex) {
+                case 0:
+                    mImagePaths.addAll(pathList);
+                    mNewSurveyView.notifyImgAdapter();
+                    break;
+                case 1:
+                    mImagePaths1.addAll(pathList);
+                    mNewSurveyView.notifyImgAdapter1();
+                    break;
+                case 2:
+                    mImagePaths2.addAll(pathList);
+                    mNewSurveyView.notifyImgAdapter2();
+                    break;
+                case 3:
+                    mImagePaths3.addAll(pathList);
+                    mNewSurveyView.notifyImgAdapter3();
+                    break;
+                case 4:
+                    mImagePaths4.addAll(pathList);
+                    mNewSurveyView.notifyImgAdapter4();
+                    break;
+            }
+            //查看图片
+            if (requestCode == VIEW_PIC && resultCode == RESULT_OK) {
+
+            }
+
         }
     }
 
