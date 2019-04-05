@@ -1,5 +1,6 @@
 package top.systemsec.survey.dialog;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,22 +10,25 @@ import android.widget.TextView;
 
 import top.systemsec.survey.R;
 
-public class DeleteImageDialog extends AlertDialog {
+public class DeleteImageDialog extends Dialog {
 
 
     private TextView mDeleteBt;
     private TextView mCancelBt;
 
     public DeleteImageDialog(@NonNull Context context) {
-        super(context);
+        super(context, R.style.DialogBackgroundNone);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);//没有标题
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);//没有标题
         setContentView(R.layout.dialog_delete_image);//设置布局
         initView();
         initListener();
+
+        Window window = getWindow();
+        window.setWindowAnimations(R.style.windowAnim);
     }
 
     private void initView() {
@@ -36,6 +40,22 @@ public class DeleteImageDialog extends AlertDialog {
         mCancelBt.setOnClickListener((v) -> {
             dismiss();//对话框消失
         });
+        mDeleteBt.setOnClickListener((v) -> {
+            if (mOnDeleteClickListener != null)
+                mOnDeleteClickListener.onDeleteClick();//点击了删除按钮
+        });
     }
 
+    /**
+     * 删除监听
+     */
+    public interface OnDeleteClickListener {
+        void onDeleteClick();//按下删除
+    }
+
+    private OnDeleteClickListener mOnDeleteClickListener;
+
+    public void setOnDeleteClickListener(OnDeleteClickListener onDeleteClickListener) {
+        mOnDeleteClickListener = onDeleteClickListener;
+    }
 }
