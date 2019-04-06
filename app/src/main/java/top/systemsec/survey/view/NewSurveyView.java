@@ -20,6 +20,7 @@ import java.util.List;
 import top.systemsec.survey.R;
 import top.systemsec.survey.adapter.ImageSelectAdapter;
 import top.systemsec.survey.bean.SurveyBean;
+import top.systemsec.survey.custom_view.SpinnerView;
 
 public class NewSurveyView extends LinearLayout {
 
@@ -34,8 +35,8 @@ public class NewSurveyView extends LinearLayout {
     private EditText mDetailAddressEdit;
     private EditText mLongitude;
     private EditText mLatitudeEdit;
-    private Spinner mStreetSpinner;
-    private Spinner mPoliceSpinner;
+    private SpinnerView mStreetSpinner;
+    private SpinnerView mPoliceSpinner;
 
     /**
      * 摄像头信息
@@ -131,6 +132,24 @@ public class NewSurveyView extends LinearLayout {
 
         mSubmitBt.setOnClickListener(onClickListener);
         mTempStorageBt.setOnClickListener(onClickListener);
+    }
+
+    /**
+     * 初始化街道
+     *
+     * @param streets 街道集合
+     */
+    public void initStreets(String[] streets) {
+        mStreetSpinner.setData(streets);
+    }
+
+    /**
+     * 初始化派出所
+     *
+     * @param polices 派出所集合
+     */
+    public void initPolices(String[] polices) {
+        mPoliceSpinner.setData(polices);
     }
 
     /**

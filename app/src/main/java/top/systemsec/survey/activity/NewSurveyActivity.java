@@ -41,7 +41,6 @@ public class NewSurveyActivity extends MVPBaseActivity {
     private final int REQUEST_CODE_CHOOSE = 0;//选择图片
     private final int VIEW_PIC = 1;//查看图片
 
-
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;//请求读取本地图片
     private final int MY_PERMISSIONS_LOCATION_CODE = 1;//定位权限
 
@@ -86,6 +85,13 @@ public class NewSurveyActivity extends MVPBaseActivity {
         mNewSurveyView.initImageAdapter2(mImagePaths2);
         mNewSurveyView.initImageAdapter3(mImagePaths3);
         mNewSurveyView.initImageAdapter4(mImagePaths4);
+
+        String[] streets = this.getResources().getStringArray(R.array.streets);//街道
+        mNewSurveyView.initStreets(streets);//街道
+
+        String[] polices = this.getResources().getStringArray(R.array.polices);//警局
+        mNewSurveyView.initPolices(polices);//初始化警局
+
     }
 
     /**
@@ -108,7 +114,7 @@ public class NewSurveyActivity extends MVPBaseActivity {
                         List<SurveyBean> surveyBeans = LitePal.findAll(SurveyBean.class);//TODO 打印所有勘察Bean
                         if (surveyBeans != null) {
                             Log.d(TAG, "initListener: surveyBeans.Size " + surveyBeans.size());
-                            for (int i =0 ; i< surveyBeans.size();i++){
+                            for (int i = 0; i < surveyBeans.size(); i++) {
                                 Log.d(TAG, "initListener: index " + i + surveyBeans.get(i));
                             }
                         }

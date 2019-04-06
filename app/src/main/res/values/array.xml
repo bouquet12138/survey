@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="streets">
+        <item>新安街道</item>
+        <item>西乡街道</item>
+        <item>航城街道</item>
+        <item>福永街道</item>
+        <item>新桥街道</item>
+        <item>沙井街道</item>
+        <item>松岗街道</item>
+        <item>燕罗街道</item>
+        <item>石岩街道</item>
+        <item>福海街道</item>
+    </string-array>
+
+    <string-array name="polices">
+        <item>宝民派出所</item>
+        <item>南沙派出所</item>
+        <item>上川派出所</item>
+        <item>官田派出所</item>
+        <item>松岗派出所</item>
+        <item>石岩派出所</item>
+        <item>塘头派出所</item>
+        <item>燕罗派出所</item>
+        <item>黄田派出所</item>
+        <item>共乐派出所</item>
+        <item>新乐派出所</item>
+        <item>沙井派出所</item>
+        <item>福海派出所</item>
+        <item>翻身派出所</item>
+        <item>东方派出所</item>
+        <item>凤凰派出所</item>
+        <item>镇南派出所</item>
+        <item>流塘派出所</item>
+        <item>新桥派出所</item>
+        <item>西乡派出所</item>
+        <item>上南派出所</item>
+        <item>坣岗派出所</item>
+        <item>福永派出所</item>
+        <item>万丰派出所</item>
+    </string-array>
+
+</resources>
