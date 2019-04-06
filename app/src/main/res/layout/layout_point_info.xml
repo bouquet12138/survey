@@ -25,16 +25,16 @@
             android:id="@+id/locText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/loc"
+            android:drawableRight="@drawable/little_loc"
             android:gravity="center_vertical"
+            android:padding="5dp"
             android:text="点击获取定位 "
-            android:textColor="@color/darkColor" />
+            android:textColor="@drawable/selector_text_color" />
 
     </LinearLayout>
 
     <!--编号-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -47,22 +47,20 @@
     </LinearLayout>
 
     <!--点位名称-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
             android:text="点位名称" />
 
         <EditText
-            android:id="@+id/nameEdit"
+            android:id="@+id/pointNameEdit"
             style="@style/style_point_info_edit" />
 
     </LinearLayout>
 
     <!--详细地址-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -75,8 +73,7 @@
     </LinearLayout>
 
     <!--经度-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -84,13 +81,14 @@
 
         <EditText
             android:id="@+id/longitude"
-            style="@style/style_point_info_edit" />
+            style="@style/style_point_info_edit"
+            android:digits="0123456789.-eEwW"
+            android:inputType="number" />
 
     </LinearLayout>
 
     <!--纬度-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -98,13 +96,14 @@
 
         <EditText
             android:id="@+id/latitudeEdit"
-            style="@style/style_point_info_edit" />
+            style="@style/style_point_info_edit"
+            android:digits="0123456789.-sSnN"
+            android:inputType="number" />
 
     </LinearLayout>
 
     <!--所属街道-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -121,8 +120,7 @@
     </LinearLayout>
 
     <!--派出所-->
-    <LinearLayout
-        style="@style/style_survey_linear">
+    <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
@@ -138,10 +136,5 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="30dp"
-        android:background="#aaa" />
 
 </LinearLayout>

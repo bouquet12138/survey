@@ -4,19 +4,22 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.adapter.ImageSelectAdapter;
+import top.systemsec.survey.bean.SurveyBean;
 
 public class NewSurveyView extends LinearLayout {
 
@@ -37,7 +40,9 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 摄像头信息
      */
-    private RadioGroup mCameraRadioGroup;
+    private RadioButton mPoleRadio;
+    private RadioButton mWallRadio;
+
     private EditText mPoleHighEdit;
     private EditText mCrossArmNumEdit;
     private EditText mDirEdit1;
@@ -83,14 +88,16 @@ public class NewSurveyView extends LinearLayout {
 
         mLocText = findViewById(R.id.locText);
         mNumberEdit = findViewById(R.id.numberEdit);
-        mNameEdit = findViewById(R.id.nameEdit);
+        mNameEdit = findViewById(R.id.pointNameEdit);
         mDetailAddressEdit = findViewById(R.id.detailAddressEdit);
         mLongitude = findViewById(R.id.longitude);
         mLatitudeEdit = findViewById(R.id.latitudeEdit);
         mStreetSpinner = findViewById(R.id.streetSpinner);
         mPoliceSpinner = findViewById(R.id.policeSpinner);
 
-        mCameraRadioGroup = findViewById(R.id.cameraRadioGroup);
+        mPoleRadio = findViewById(R.id.poleRadio);//立杆安装
+        mWallRadio = findViewById(R.id.wallRadio);//壁挂安装
+
         mPoleHighEdit = findViewById(R.id.poleHighEdit);
         mCrossArmNumEdit = findViewById(R.id.crossArmNumEdit);
         mDirEdit1 = findViewById(R.id.dirEdit1);
@@ -119,6 +126,9 @@ public class NewSurveyView extends LinearLayout {
      */
     public void initClickListener(OnClickListener onClickListener) {
         mBackImage.setOnClickListener(onClickListener);
+
+        mLocText.setOnClickListener(onClickListener);//定位
+
         mSubmitBt.setOnClickListener(onClickListener);
         mTempStorageBt.setOnClickListener(onClickListener);
     }
@@ -210,6 +220,161 @@ public class NewSurveyView extends LinearLayout {
 
     public void notifyImgAdapter4() {
         mImageSelectAdapter4.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    /**
+     * 设置经度
+     */
+    public void setLongitude(String longitude) {
+        mLongitude.setText(longitude);
+    }
+
+    /**
+     * 设置纬度
+     */
+    public void setLatitude(String latitude) {
+        mLatitudeEdit.setText(latitude);
+    }
+
+    /**
+     * 得到信息
+     */
+    public SurveyBean getSurveyInfo() {
+
+        String number = mNumberEdit.getText().toString();//编号
+
+        if (TextUtils.isEmpty(number)) {
+            Toast.makeText(getContext(), "编号不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String pointName = mNameEdit.getText().toString();//点位名称
+        if (TextUtils.isEmpty(pointName)) {
+            Toast.makeText(getContext(), "点位名称不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String detailAddress = mDetailAddressEdit.getText().toString();//点位名称
+        if (TextUtils.isEmpty(detailAddress)) {
+            Toast.makeText(getContext(), "详细地址不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String longitude = mLongitude.getText().toString();//点位名称
+        if (TextUtils.isEmpty(longitude)) {
+            Toast.makeText(getContext(), "经度不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String latitude = mLatitudeEdit.getText().toString();//点位名称
+        if (TextUtils.isEmpty(latitude)) {
+            Toast.makeText(getContext(), "纬度不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String street = "";  //TODO:所属街道 还没数据
+        String police = "";   //TODO：派出所 还没数据
+
+
+        String installType = "poleInstall";//TODO:立杆安装
+        if (mWallRadio.isChecked())
+            installType = "wallInstall";//TODO:壁挂安装
+
+        String poleHighStr = mPoleHighEdit.getText().toString();
+        float poleHigh;//立杆
+        if (TextUtils.isEmpty(poleHighStr)) {
+            Toast.makeText(getContext(), "立杆高度不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
+            try {
+                poleHigh = Float.parseFloat(poleHighStr);//解析一下字符串
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "请输入正确的立杆高度", Toast.LENGTH_SHORT).show();
+                return null;//退出
+            }
+        }
+
+        String crossArmNumStr = mCrossArmNumEdit.getText().toString();
+        int crossArmNum;//横臂数量
+        if (TextUtils.isEmpty(crossArmNumStr)) {
+            Toast.makeText(getContext(), "横臂数不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
+            crossArmNum = Integer.parseInt(crossArmNumStr);//解析一下横臂数
+        }
+
+        String dir1 = mDirEdit1.getText().toString();
+        String dir2 = mDirEdit2.getText().toString();
+
+        String faceRecNumStr = mFaceRecNumEdit.getText().toString();
+        int faceRecNum = 0;//人脸识别数
+        if (!TextUtils.isEmpty(faceRecNumStr)) {
+            faceRecNum = Integer.parseInt(faceRecNumStr);
+        }
+
+        String faceLightNumStr = mFaceLightNumEdit.getText().toString();
+        int faceLightNum = 0;//人脸补光灯数
+        if (!TextUtils.isEmpty(faceLightNumStr)) {
+            faceLightNum = Integer.parseInt(faceLightNumStr);
+        }
+
+        String carRecNumStr = mCarNumRecNumEdit.getText().toString();
+        int carRecNum = 0;//车牌识别
+        if (!TextUtils.isEmpty(carRecNumStr)) {
+            carRecNum = Integer.parseInt(carRecNumStr);
+        }
+
+        String globalNumStr = mGlobalNumEdit.getText().toString();
+        int globalNum = 0;//环球监控头
+        if (!TextUtils.isEmpty(globalNumStr)) {
+            globalNum = Integer.parseInt(globalNumStr);
+        }
+
+
+        List<String> list = mImageSelectAdapter.getImagePaths();
+
+        if (list.size() != 8) {
+            Toast.makeText(getContext(), "环境图片必须8张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        List<String> list1 = mImageSelectAdapter1.getImagePaths();
+
+        if (list1.size() != 2) {
+            Toast.makeText(getContext(), "全景照必须2张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        List<String> list2 = mImageSelectAdapter2.getImagePaths();
+
+        if (list2.size() != 2) {
+            Toast.makeText(getContext(), "近景照必须2张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        List<String> list3 = mImageSelectAdapter3.getImagePaths();
+
+        if (list3.size() != 1) {
+            Toast.makeText(getContext(), "gps必须1张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        List<String> list4 = mImageSelectAdapter4.getImagePaths();
+
+        if (list4.size() != 1) {
+            Toast.makeText(getContext(), "现场画面照必须1张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String remark = mRemarkEdit.getText().toString();
+
+        SurveyBean surveyBean = new SurveyBean(
+                number, pointName, detailAddress, longitude, latitude, street, police,//点位信息
+                installType, poleHigh, crossArmNum, dir1, dir2, faceRecNum, faceLightNum, carRecNum, globalNum,//摄像机信息
+                list, list1, list2, list3.get(0), list4.get(0),//图像信息
+                remark);//备注
+
+        return surveyBean;
     }
 
 }

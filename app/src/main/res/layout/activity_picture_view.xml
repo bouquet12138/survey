@@ -5,33 +5,30 @@
     android:orientation="vertical">
 
     <!--标题栏-->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/appBackColor"
-        android:gravity="center_vertical">
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            style="@style/style_title"
+            android:text="环境照1/7" />
 
         <ImageView
             android:id="@+id/backImage"
             style="@style/style_back_image" />
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="环境照1/7"
-            android:textSize="25dp" />
-
         <ImageView
             android:id="@+id/deleteImg"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="5dp"
             android:src="@drawable/selector_trash" />
 
-    </LinearLayout>
+    </RelativeLayout>
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"

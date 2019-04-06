@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/appBackColor"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingRight="10dp">
 
     <!--头部-->
     <TextView
@@ -21,11 +22,11 @@
     <LinearLayout style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
-            style="@style/style_point_info_text"
+            style="@style/style_camera_info_text"
             android:text="安装方式" />
 
         <RadioGroup
-            android:id="@+id/cameraRadioGroup"
+            android:id="@+id/cameraInstallTypeGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -61,22 +62,23 @@
         <EditText
             android:id="@+id/poleHighEdit"
             style="@style/style_camera_info_edit"
+            android:digits="0123456789."
             android:inputType="number" />
 
         <TextView
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:text="米" />
+            android:text="米"
+            android:textSize="15dp" />
 
         <top.systemsec.survey.custom_view.MyHintTextView
-
             style="@style/style_camera_info_text"
             android:text="横臂数量" />
 
         <EditText
             android:id="@+id/crossArmNumEdit"
-            android:layout_marginRight="20dp"
             style="@style/style_camera_info_edit"
+            android:layout_marginRight="20dp"
             android:inputType="number" />
 
     </LinearLayout>
@@ -95,13 +97,13 @@
 
         <TextView
             style="@style/style_camera_info_text"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="15dp"
             android:text="枪机覆盖\n方向2" />
 
         <EditText
             android:id="@+id/dirEdit2"
-            android:layout_marginRight="20dp"
-            style="@style/style_camera_info_edit" />
+            style="@style/style_camera_info_edit"
+            android:layout_marginRight="20dp" />
 
     </LinearLayout>
 
@@ -119,9 +121,10 @@
             android:inputType="number" />
 
         <TextView
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:text="个" />
+            android:text="个"
+            android:textSize="15dp" />
 
         <TextView
             style="@style/style_camera_info_text"
@@ -133,9 +136,10 @@
             android:inputType="number" />
 
         <TextView
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:text="个" />
+            android:text="个"
+            android:textSize="15dp" />
 
     </LinearLayout>
 
@@ -153,9 +157,10 @@
             android:inputType="number" />
 
         <TextView
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:text="个" />
+            android:text="个"
+            android:textSize="15dp" />
 
         <TextView
             style="@style/style_camera_info_text"
@@ -167,17 +172,12 @@
             android:inputType="number" />
 
         <TextView
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:text="个" />
+            android:text="个"
+            android:textSize="15dp" />
 
     </LinearLayout>
 
-    <!--横线-->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="30dp"
-        android:background="#aaa" />
 
 </LinearLayout>

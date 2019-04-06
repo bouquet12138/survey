@@ -161,4 +161,13 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
     public void setOnImageClickListener(OnImageClickListener onImageClickListener) {
         mOnImageClickListener = onImageClickListener;
     }
+
+    /**
+     * 得到图片路径
+     *
+     * @return
+     */
+    public List<String> getImagePaths() {
+        return mImagePaths;
+    }
 }

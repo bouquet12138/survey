@@ -13,14 +13,16 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import top.systemsec.survey.R;
+import top.systemsec.survey.base.BaseActivity;
 import top.systemsec.survey.dialog.DeleteImageDialog;
 import top.systemsec.survey.fragment.LittlePicFragment;
 
-public class PictureViewActivity extends AppCompatActivity {
+public class PictureViewActivity extends BaseActivity {
 
     private static final String TAG = "PictureViewActivity";
 
@@ -97,12 +99,7 @@ public class PictureViewActivity extends AppCompatActivity {
      */
     private void initListener() {
         mBackImage.setOnClickListener((v) -> {
-            if (!mHasDelete)
-                finish();//销毁Activity
-            else {
-                setResult(RESULT_OK, new Intent());//有删除图片
-                finish();//结束activity
-            }
+            back();
         });
         mDeleteImg.setOnClickListener((v) -> {
             mDeleteImageDialog.show();//删除图片对话框显示
@@ -163,6 +160,31 @@ public class PictureViewActivity extends AppCompatActivity {
         @Override
         public int getItemPosition(@NonNull Object object) {
             return PagerAdapter.POSITION_NONE;
+        }
+    }
+
+    /**
+     * 按下返回键
+     */
+    @Override
+    public void onBackPressed() {
+        back();
+    }
+
+    /**
+     * 返回
+     */
+    private void back() {
+        if (!mHasDelete)
+            finish();//销毁Activity
+        else {
+            Intent intent = new Intent();
+            List<String> imageList = new ArrayList<>();//图片路径
+            for (LittlePicFragment littlePicFragment : mFragments)
+                imageList.add(littlePicFragment.getImagePath());//添加图片路径
+            intent.putExtra("imageList", (Serializable) imageList);
+            setResult(RESULT_OK, intent);//有删除图片
+            finish();//结束activity
         }
     }
 

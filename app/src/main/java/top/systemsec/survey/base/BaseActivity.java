@@ -25,13 +25,4 @@ public class BaseActivity extends AppCompatActivity {
         ActivityCollector.removeActivity(this);
     }
 
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        Log.d("BaseActivity", "onWindowFocusChanged: hasFocus " + hasFocus);
-        super.onWindowFocusChanged(hasFocus);
-
-    }
-
-
 }

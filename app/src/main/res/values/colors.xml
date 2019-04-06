@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="lightColor">#acdff7</color>
-    <color name="darkColor">#3393D6</color>
-    <color name="colorPrimary">#3ca9f7</color>
-    <color name="colorPrimaryDark">#efefef</color>
-    <color name="colorAccent">#3B87D6</color>
+    <color name="lightColor">#7FA5FF</color>
+    <color name="darkColor">#527be0</color>
+    <color name="colorPrimary">#5b8cff</color>
+    <color name="colorPrimaryDark">#527be0</color>
+    <color name="colorAccent">#5b8cff</color>
     <color name="trans_color">#0000</color>
-    <color name="appBackColor">#efefef</color>
+    <color name="appBackColor">#ffffff</color>
 </resources>

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -17,13 +16,13 @@ public class DeleteImageDialog extends Dialog {
     private TextView mCancelBt;
 
     public DeleteImageDialog(@NonNull Context context) {
-        super(context, R.style.DialogBackgroundNone);
+        super(context, R.style.DialogBackgroundNull);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //requestWindowFeature(Window.FEATURE_NO_TITLE);//没有标题
-        setContentView(R.layout.dialog_delete_image);//设置布局
+        setContentView(R.layout.dialog_app_alert);//设置布局
         initView();
         initListener();
 

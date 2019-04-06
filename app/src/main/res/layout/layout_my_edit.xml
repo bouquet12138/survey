@@ -3,20 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+
     <EditText
         android:id="@+id/myEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_input"
-        android:padding="5dp" />
+        android:hint="请输入搜索关键字"
+        android:paddingLeft="30dp"
+        android:paddingTop="8dp"
+        android:paddingRight="30dp"
+        android:paddingBottom="8dp"
+        android:textSize="14dp" />
 
     <ImageView
         android:id="@+id/deleteImg"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
-        android:padding="4dp"
+        android:layout_centerVertical="true"
+        android:padding="6dp"
         android:src="@drawable/delete_image"
         android:visibility="gone" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/search" />
 
 </RelativeLayout>

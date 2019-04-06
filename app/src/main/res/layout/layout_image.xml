@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/left"
         android:gravity="center_vertical"
-        android:text="  摄像头信息"
+        android:text="  图像采集"
         android:textColor="#000"
         android:textSize="23dp" />
 

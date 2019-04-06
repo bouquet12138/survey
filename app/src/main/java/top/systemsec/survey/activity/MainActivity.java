@@ -5,15 +5,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import top.systemsec.survey.R;
+import top.systemsec.survey.base.BaseActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private ViewGroup mNewSurvey;
     private ViewGroup mSaveInfo;
     private ViewGroup mSiteManage;
+
+    private ImageView mPersonalCenterImg;//个人中心
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mNewSurvey = findViewById(R.id.newSurvey);
         mSaveInfo = findViewById(R.id.saveInfo);
         mSiteManage = findViewById(R.id.siteManage);
+        mPersonalCenterImg = findViewById(R.id.personalCenterImg);
     }
 
     /**
@@ -36,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mNewSurvey.setOnClickListener(this);
         mSaveInfo.setOnClickListener(this);
         mSiteManage.setOnClickListener(this);
+        mPersonalCenterImg.setOnClickListener(this);//点击监听
     }
 
     @Override
@@ -49,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.siteManage:
                 startActivity(new Intent(MainActivity.this, SiteManageActivity.class));
+                break;
+            case R.id.personalCenterImg:
+                startActivity(new Intent(MainActivity.this, PersonalCenterActivity.class));//个人中心
                 break;
         }
     }
