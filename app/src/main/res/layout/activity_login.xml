@@ -57,7 +57,7 @@
         android:textColor="#fff"
         android:textSize="18dp" />
 
-    <TextView
+  <!--  <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10dp"
@@ -65,6 +65,6 @@
         android:layout_marginTop="40dp"
         android:textColor="#bbb"
         android:text="I agree to the google Terms of service and\nPrivacy Policy"
-        />
+        />-->
 
 </LinearLayout>

@@ -19,4 +19,11 @@ public interface ITempStorageView extends IMVPBaseView {
      */
     void setSearchResult(List<SurveyBean> surveyBeans);
 
+    /**
+     * 没有数据
+     *
+     * @param show
+     */
+    void showNoData(boolean show);
+
 }

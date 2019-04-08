@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<top.systemsec.survey.view.NewSurveyView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/newSurveyView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/appBackColor"
+    android:orientation="vertical">
+
+    <!--标题栏-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/style_title"
+            android:text="暂存信息" />
+
+        <ImageView
+            android:id="@+id/backImage"
+            style="@style/style_back_image" />
+    </RelativeLayout>
+
+    <!--滚动布局-->
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--点位信息-->
+            <include layout="@layout/layout_point_info" />
+
+            <include layout="@layout/layout_camera" />
+
+            <include layout="@layout/layout_image" />
+
+            <include layout="@layout/layout_remark" />
+
+            <!--按钮-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="20dp">
+
+                <Button
+                    android:id="@+id/submitBt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_bt"
+                    android:text="提   交"
+                    android:textColor="#fff"
+                    android:textSize="18dp" />
+
+
+                <Button
+                    android:id="@+id/cancelBt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_gray_bt"
+                    android:text="取   消"
+                    android:textColor="#fff"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="10dp"
+                android:text="  温馨提示：\n【暂存】仅上传数据，图片未上传，保存至暂存列表\n【提交】建议在WiFi环境下点击，上传数据及图片"
+                android:textSize="13dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+</top.systemsec.survey.view.NewSurveyView>

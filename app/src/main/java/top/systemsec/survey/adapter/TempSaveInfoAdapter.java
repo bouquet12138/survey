@@ -31,8 +31,13 @@ public class TempSaveInfoAdapter extends RecyclerView.Adapter<TempSaveInfoAdapte
 
         SurveyBean surveyBean = mSurveyBeans.get(position);//得到该位置的surveyBean
 
+        holder.mViewGroup.setOnClickListener((v) -> {
+            if (mOnItemClickListener != null)
+                mOnItemClickListener.onItemClick(position);//点击监听
+        });
+
         holder.mIndexTextView.setText(position + 1 + "");//编号
-        holder.mNumAndPointText.setText(surveyBean.getNumber() + "    " + surveyBean.getPointName());
+        holder.mPointNameText.setText(surveyBean.getPointName());//点名称
         holder.mSaveTimeTextView.setText("保存时间： " + surveyBean.getSaveTime());//保存时间
     }
 
@@ -43,15 +48,27 @@ public class TempSaveInfoAdapter extends RecyclerView.Adapter<TempSaveInfoAdapte
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
+        ViewGroup mViewGroup;
         TextView mIndexTextView;
-        TextView mNumAndPointText;
+        TextView mPointNameText;//点名称
         TextView mSaveTimeTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            mViewGroup = itemView.findViewById(R.id.viewGroup);
             mIndexTextView = itemView.findViewById(R.id.indexTextView);
-            mNumAndPointText = itemView.findViewById(R.id.numAndPointText);
+            mPointNameText = itemView.findViewById(R.id.pointNameText);
             mSaveTimeTextView = itemView.findViewById(R.id.saveTimeTextView);
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int index);
+    }
+
+    private OnItemClickListener mOnItemClickListener;//项目点击
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 }

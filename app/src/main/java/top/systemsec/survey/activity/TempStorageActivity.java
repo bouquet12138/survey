@@ -3,9 +3,13 @@ package top.systemsec.survey.activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +24,8 @@ import top.systemsec.survey.view.ITempStorageView;
 
 public class TempStorageActivity extends MVPBaseActivity implements View.OnClickListener, ITempStorageView {
 
+    private static final String TAG = "TempStorageActivity";
+
     private TempStoragePresenter mTempStoragePresenter;
 
     private ImageView mBackImage;
@@ -29,6 +35,7 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
     private TempSaveInfoAdapter mTempSaveInfoAdapter;
 
     private List<SurveyBean> mSurveyBeanList = new ArrayList<>();//勘察Bean
+    private TextView mNoData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +46,7 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
 
         mTempStoragePresenter = new TempStoragePresenter();
         mTempStoragePresenter.attachView(this);
-
+        mTempStoragePresenter.search();//刚上来就搜索一下
     }
 
     private void initView() {
@@ -47,11 +54,14 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
         mMyEdit = findViewById(R.id.myEdit);
         mSearchBt = findViewById(R.id.searchBt);
         mRecyclerView = findViewById(R.id.recyclerView);
+        mNoData = findViewById(R.id.noData);
     }
 
     private void initListener() {
         mBackImage.setOnClickListener(this);
         mSearchBt.setOnClickListener(this);
+
+        mMyEdit.setOnTextChangeListener((str) -> mTempStoragePresenter.search());//搜索一下
     }
 
     @Override
@@ -91,9 +101,26 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
             mTempSaveInfoAdapter = new TempSaveInfoAdapter(mSurveyBeanList);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(TempStorageActivity.this));//垂直布局
             mRecyclerView.setAdapter(mTempSaveInfoAdapter);//设置适配器
+
+            mTempSaveInfoAdapter.setOnItemClickListener((position) -> {
+                SurveyBean surveyBean = mSurveyBeanList.get(position);//得到勘察Bean
+                Gson gson = new Gson();
+                String surveyBeanStr = gson.toJson(surveyBean);//转换成json字符串
+                Log.d(TAG, "setSearchResult: json " + surveyBeanStr);
+                TempStorageShowActivity.actionStart(surveyBeanStr, TempStorageActivity.this);//跳转活动
+            });
+
         } else {
             mTempSaveInfoAdapter.notifyDataSetChanged();//唤醒数据更新
         }
+    }
+
+    @Override
+    public void showNoData(boolean show) {
+        if (show)
+            mNoData.setVisibility(View.VISIBLE);//可见
+        else
+            mNoData.setVisibility(View.GONE);//不可见
     }
 
     @Override

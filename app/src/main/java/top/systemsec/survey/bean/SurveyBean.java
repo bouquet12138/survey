@@ -1,6 +1,5 @@
 package top.systemsec.survey.bean;
 
-import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
 import java.text.SimpleDateFormat;
@@ -9,11 +8,6 @@ import java.util.List;
 
 public class SurveyBean extends LitePalSupport {
 
-    /**
-     * 点位信息
-     */
-    @Column(unique = true, defaultValue = "unknown")
-    private String number;//编号 唯一
     private String pointName;
     private String detailAddress;
     private String longitude;
@@ -27,8 +21,8 @@ public class SurveyBean extends LitePalSupport {
     private String cameraInstallType;
     private float poleHigh;
     private int crossArmNum;
-    private String dirEdit1;
-    private String dirEdit2;
+    private String dir1;
+    private String dir2;
     private int faceRecNum;
     private int faceLightNum;
     private int carNumRecNum;
@@ -55,11 +49,10 @@ public class SurveyBean extends LitePalSupport {
     public SurveyBean() {
     }
 
-    public SurveyBean(String number, String pointName, String detailAddress, String longitude, String latitude, String street, String police,
-                      String cameraInstallType, float poleHigh, int crossArmNum, String dirEdit1, String dirEdit2, int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum,
+    public SurveyBean(String pointName, String detailAddress, String longitude, String latitude, String street, String police,
+                      String cameraInstallType, float poleHigh, int crossArmNum, String dir1, String dir2, int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum,
                       List<String> envImgList, List<String> overallViewList, List<String> closeShotList, String gpsImgList, String sceneImgList,
                       String remark) {
-        this.number = number;
         this.pointName = pointName;
         this.detailAddress = detailAddress;
         this.longitude = longitude;
@@ -69,8 +62,8 @@ public class SurveyBean extends LitePalSupport {
         this.cameraInstallType = cameraInstallType;
         this.poleHigh = poleHigh;
         this.crossArmNum = crossArmNum;
-        this.dirEdit1 = dirEdit1;
-        this.dirEdit2 = dirEdit2;
+        this.dir1 = dir1;
+        this.dir2 = dir2;
         this.faceRecNum = faceRecNum;
         this.faceLightNum = faceLightNum;
         this.carNumRecNum = carNumRecNum;
@@ -84,14 +77,6 @@ public class SurveyBean extends LitePalSupport {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         saveTime = simpleDateFormat.format(new Date());//格式化一个日期
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
     }
 
     public String getPointName() {
@@ -166,20 +151,20 @@ public class SurveyBean extends LitePalSupport {
         this.crossArmNum = crossArmNum;
     }
 
-    public String getDirEdit1() {
-        return dirEdit1;
+    public String getDir1() {
+        return dir1;
     }
 
-    public void setDirEdit1(String dirEdit1) {
-        this.dirEdit1 = dirEdit1;
+    public void setDir1(String dir1) {
+        this.dir1 = dir1;
     }
 
-    public String getDirEdit2() {
-        return dirEdit2;
+    public String getDir2() {
+        return dir2;
     }
 
-    public void setDirEdit2(String dirEdit2) {
-        this.dirEdit2 = dirEdit2;
+    public void setDir2(String dir2) {
+        this.dir2 = dir2;
     }
 
     public int getFaceRecNum() {
@@ -273,7 +258,6 @@ public class SurveyBean extends LitePalSupport {
     @Override
     public String toString() {
         return "SurveyBean{" +
-                "number='" + number + '\'' +
                 ", pointName='" + pointName + '\'' +
                 ", detailAddress='" + detailAddress + '\'' +
                 ", longitude='" + longitude + '\'' +
@@ -283,8 +267,8 @@ public class SurveyBean extends LitePalSupport {
                 ", cameraInstallType='" + cameraInstallType + '\'' +
                 ", poleHigh=" + poleHigh +
                 ", crossArmNum=" + crossArmNum +
-                ", dirEdit1='" + dirEdit1 + '\'' +
-                ", dirEdit2='" + dirEdit2 + '\'' +
+                ", dir1='" + dir1 + '\'' +
+                ", dir2='" + dir2 + '\'' +
                 ", faceRecNum=" + faceRecNum +
                 ", faceLightNum=" + faceLightNum +
                 ", carNumRecNum=" + carNumRecNum +

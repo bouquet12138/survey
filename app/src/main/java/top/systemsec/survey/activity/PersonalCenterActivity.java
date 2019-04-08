@@ -10,6 +10,8 @@ import android.widget.TextView;
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.ActivityCollector;
 import top.systemsec.survey.base.BaseActivity;
+import top.systemsec.survey.base.NowUserInfo;
+import top.systemsec.survey.bean.UserBean;
 import top.systemsec.survey.dialog.ConfirmDialog;
 
 public class PersonalCenterActivity extends BaseActivity implements View.OnClickListener {
@@ -32,6 +34,7 @@ public class PersonalCenterActivity extends BaseActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_center);
         initView();
+        initData();
         initListener();
     }
 
@@ -49,6 +52,20 @@ public class PersonalCenterActivity extends BaseActivity implements View.OnClick
         mFeedBack = findViewById(R.id.feedBack);
         mAbout = findViewById(R.id.about);
         mQuitBt = findViewById(R.id.quitBt);
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData() {
+        UserBean userBean = NowUserInfo.getUserBean();
+
+        if (userBean != null) {
+            mUserName.setText(userBean.getName());//姓名
+            mPhoneNum.setText(userBean.getPhone());//手机号
+
+        }
+
     }
 
     private void initListener() {

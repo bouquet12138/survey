@@ -43,7 +43,8 @@
             android:layout_height="30dp"
             android:background="@drawable/selector_bt"
             android:text="搜索"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -53,5 +54,14 @@
         android:layout_height="wrap_content">
 
     </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/noData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="没有数据"
+        android:visibility="gone" />
 
 </LinearLayout>

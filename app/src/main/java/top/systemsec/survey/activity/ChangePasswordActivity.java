@@ -26,7 +26,6 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
     private ImageView mBackImage;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +84,7 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
                 judgePassword();//判断前后密码
 
                 if (TextUtils.isEmpty(password1) || password1.length() < 6 || password1.length() > 10) {
-                    mNewPasswordHint.setText("新密码不符合要求！");
+                    mNewPasswordHint.setText("请输入6-10位新密码");
                     mNewPW = false;
                 } else {
                     mNewPasswordHint.setText("");

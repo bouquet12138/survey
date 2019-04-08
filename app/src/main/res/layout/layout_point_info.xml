@@ -34,14 +34,16 @@
     </LinearLayout>
 
     <!--编号-->
-    <LinearLayout style="@style/style_survey_linear">
+    <LinearLayout
+        android:id="@+id/numberLinear"
+        style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
             style="@style/style_point_info_text"
             android:text="编号" />
 
-        <EditText
-            android:id="@+id/numberEdit"
+        <TextView
+            android:id="@+id/numberText"
             style="@style/style_point_info_edit" />
 
     </LinearLayout>

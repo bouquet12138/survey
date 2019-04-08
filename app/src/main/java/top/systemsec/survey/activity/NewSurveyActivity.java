@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -20,22 +23,25 @@ import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 
-import org.litepal.LitePal;
-
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import top.systemsec.survey.base.MVPBaseActivity;
 import top.systemsec.survey.bean.SurveyBean;
+import top.systemsec.survey.presenter.NewSurveyPresenter;
 import top.systemsec.survey.utils.GifSizeFilter;
 import top.systemsec.survey.utils.Glide4Engine;
 import top.systemsec.survey.R;
+import top.systemsec.survey.utils.MatisseUtil;
+import top.systemsec.survey.view.INewSurveyView;
 import top.systemsec.survey.view.NewSurveyView;
 
 
-public class NewSurveyActivity extends MVPBaseActivity {
+public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView {
 
+    private NewSurveyPresenter mNewSurveyPresenter;//主持
     private static final String TAG = "NewSurveyActivity";
 
     private final int REQUEST_CODE_CHOOSE = 0;//选择图片
@@ -57,6 +63,9 @@ public class NewSurveyActivity extends MVPBaseActivity {
 
     private LocationClient mLocationClient;
 
+    private Button mTempStorageBt;//暂存按钮
+    private Button mSubmitBt;//提交按钮
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +75,8 @@ public class NewSurveyActivity extends MVPBaseActivity {
         initView();
         initAdapter();
         initListener();
+        mNewSurveyPresenter = new NewSurveyPresenter();//支持
+        mNewSurveyPresenter.attachView(this);//绑定一下
     }
 
     /**
@@ -74,6 +85,10 @@ public class NewSurveyActivity extends MVPBaseActivity {
     private void initView() {
         mNewSurveyView = findViewById(R.id.newSurveyView);//新勘察
         mNewSurveyView.initView();//初始化view
+
+        mTempStorageBt = findViewById(R.id.tempStorageBt);//暂存按钮
+        mSubmitBt = findViewById(R.id.submitBt);
+
     }
 
     /**
@@ -99,29 +114,24 @@ public class NewSurveyActivity extends MVPBaseActivity {
      */
     private void initListener() {
         mNewSurveyView.initClickListener((v) -> {
-            switch (v.getId()) {
-                case R.id.backImage:
-                    finish();//返回销毁
-                    break;
-                case R.id.locText://获取位置
-                    obtainLocAuthor();//获取位置
-                    break;
-                case R.id.tempStorageBt://暂存信息按钮
-
-                    SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-                    if (surveyBean != null) {
-                        surveyBean.save();//TODO:覆盖数据
-                        List<SurveyBean> surveyBeans = LitePal.findAll(SurveyBean.class);//TODO 打印所有勘察Bean
-                        if (surveyBeans != null) {
-                            Log.d(TAG, "initListener: surveyBeans.Size " + surveyBeans.size());
-                            for (int i = 0; i < surveyBeans.size(); i++) {
-                                Log.d(TAG, "initListener: index " + i + surveyBeans.get(i));
-                            }
-                        }
-                        Toast.makeText(this, "数据保存成功", Toast.LENGTH_SHORT).show();
+                    switch (v.getId()) {
+                        case R.id.backImage:
+                            finish();//返回销毁
+                            break;
+                        case R.id.locText://获取位置
+                            obtainLocAuthor();//获取位置
+                            break;
                     }
-                    break;
-            }
+                }
+        );
+
+        //提交
+        mSubmitBt.setOnClickListener((v) -> {
+
+        });
+        mTempStorageBt.setOnClickListener((v) -> {
+            SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
+            mNewSurveyPresenter.saveSurvey(surveyBean);//保存一下
         });
 
         /**
@@ -158,10 +168,14 @@ public class NewSurveyActivity extends MVPBaseActivity {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
                 // 从数组中取出返回结果
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(this, "用户拒绝权限无法打开相册", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
                     selectImage();//从本地选择图片
-                } else {
-                    Toast.makeText(this, "用户拒绝权限，无法读取本地图片", Toast.LENGTH_SHORT).show();
                 }
             }
             break;
@@ -182,18 +196,26 @@ public class NewSurveyActivity extends MVPBaseActivity {
      * 从相册选择图片 权限
      */
     private void selectImageAuthor() {
-        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        List<String> permissionList = new ArrayList<>();//权限组
+        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);//读取权限
+        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);//写权限
+        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            permissionList.add(Manifest.permission.CAMERA);//相机权限
+
+        if (permissionList.size() != 0) {
             // 如果用户已经拒绝了当前权限,shouldShowRequestPermissionRationale返回true，此时我们需要进行必要的解释和处理
-            if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Toast.makeText(NewSurveyActivity.this, "用户拒绝了权限，不能读取本地图片", Toast.LENGTH_SHORT).show();
-            } else {
-                //请求权限
-                ActivityCompat.requestPermissions(NewSurveyActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+            for (String str : permissionList) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this, str)) {
+                    Toast.makeText(NewSurveyActivity.this, "用户拒绝了权限，不能读取本地图片，" +
+                            "请到设置界面打开", Toast.LENGTH_SHORT).show();
+                    return;//返回出去
+                }
             }
+            ActivityCompat.requestPermissions(NewSurveyActivity.this,
+                    permissionList.toArray(new String[permissionList.size()]), MY_PERMISSIONS_REQUEST_READ_CONTACTS);//读取相册
+
         } else {
             selectImage();//从本地选择图片
         }
@@ -223,22 +245,7 @@ public class NewSurveyActivity extends MVPBaseActivity {
      * 从相册选择图片
      */
     public void selectImage() {
-        Matisse.from(NewSurveyActivity.this)
-                .choose(MimeType.ofImage(), false)
-                .countable(true)
-                .capture(true)
-                .captureStrategy(
-                        new CaptureStrategy(true, "com.example.survey.sample.fileprovider"))
-                .maxSelectable(mMaxImgNum)
-                .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
-                .gridExpectedSize(
-                        getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
-                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                .thumbnailScale(0.85f)
-                .imageEngine(new Glide4Engine())
-                .originalEnable(true)
-                .maxOriginalSize(10)
-                .forResult(REQUEST_CODE_CHOOSE);
+        MatisseUtil.selectImage(NewSurveyActivity.this, mMaxImgNum, getResources(), REQUEST_CODE_CHOOSE);
     }
 
     /**
@@ -254,6 +261,12 @@ public class NewSurveyActivity extends MVPBaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             List<String> pathList = Matisse.obtainPathResult(data);
+            List<Uri> uriList = Matisse.obtainResult(data);
+            Log.d(TAG, "onActivityResult: uriList " + uriList);
+            Log.d(TAG, "onActivityResult: pathList " + pathList);
+            if (uriList.size() == 1)
+                NewSurveyActivity.this.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uriList.get(0)));
+
             switch (mNowAddImgIndex) {
                 case 0:
                     mImagePaths.addAll(pathList);
@@ -315,13 +328,17 @@ public class NewSurveyActivity extends MVPBaseActivity {
 
     }
 
+    /**
+     * 定位
+     */
     public class MyLocationListener extends BDAbstractLocationListener {
-
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             hideLoading();//隐藏dialog
             double longitude = bdLocation.getLongitude();
             double latitude = bdLocation.getLatitude();
+            Log.d(TAG, "onReceiveLocation: longitude " + longitude);
+            Log.d(TAG, "onReceiveLocation: latitude " + latitude);
             if (longitude == 4.9E-324 || latitude == 4.9E-324) {
                 Toast.makeText(NewSurveyActivity.this, "位置获取失败", Toast.LENGTH_SHORT).show();
             } else {

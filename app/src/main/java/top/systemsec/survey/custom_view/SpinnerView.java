@@ -2,9 +2,10 @@ package top.systemsec.survey.custom_view;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.v4.view.GravityCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,9 +28,9 @@ public class SpinnerView extends LinearLayout {
     private ListViewAdapter mAdapter;
     private PopupWindow mPopupWindow;
     private TextView mSpinnerText;
+
+    private String mNowStr;//当前字符串
     private String[] mListData;
-    private Drawable mRightDrawable;
-    private Drawable mDownDrawable;
 
     public SpinnerView(Context context) {
         super(context);
@@ -50,10 +51,8 @@ public class SpinnerView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.layout_spinner_head, this);
         mSpinnerText = findViewById(R.id.textView);
-
-        mRightDrawable = getContext().getResources().getDrawable(R.drawable.right_rectangle);
-        mDownDrawable = getContext().getResources().getDrawable(R.drawable.down_rectangle);
-
+        if (!TextUtils.isEmpty(mNowStr))//不是空
+            mSpinnerText.setText(mNowStr);//设置字符串
     }
 
     public void setData(String[] data) {
@@ -61,8 +60,8 @@ public class SpinnerView extends LinearLayout {
         mAdapter = new ListViewAdapter(getContext(), R.layout.item_string, data); //默认设置下拉框的标题为数据的第一个
         mSpinnerText.setOnClickListener((v) -> {
                     initView();
-                    mSpinnerText.setCompoundDrawables(null, null, mDownDrawable, null);
-                    mPopupWindow.showAsDropDown(v, 0, 0);
+
+                    mPopupWindow.showAsDropDown(mSpinnerText);
                 }
         );
     }
@@ -77,9 +76,8 @@ public class SpinnerView extends LinearLayout {
             mListView.setAdapter(mAdapter);
             // listView的item点击事件
             mListView.setOnItemClickListener((AdapterView<?> arg0, View arg1, int arg2, long arg3) -> {
-                        mSpinnerText.setText(mListData[arg2]);// 设置所选的item作为下拉框的标题
-                        mSpinnerText.setCompoundDrawables(null, null, mRightDrawable, null);
-
+                        mNowStr = mListData[arg2];
+                        mSpinnerText.setText(mNowStr);// 设置所选的item作为下拉框的标题
                         if (mPopupWindow != null)
                             mPopupWindow.dismiss(); //弹框消失
                     }
@@ -107,4 +105,23 @@ public class SpinnerView extends LinearLayout {
 
     }
 
+    /**
+     * 设置当前
+     *
+     * @param nowStr
+     */
+    public void setNowStr(String nowStr) {
+        mNowStr = nowStr;
+        if (mSpinnerText != null)
+            mSpinnerText.setText(mNowStr);//设置名称
+    }
+
+    /**
+     * 得到当前字符串
+     *
+     * @return
+     */
+    public String getNowStr() {
+        return mNowStr;
+    }
 }

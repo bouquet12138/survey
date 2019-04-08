@@ -64,6 +64,8 @@ public class MyEditText extends RelativeLayout {
                     mDeleteImg.setVisibility(GONE);
                 else
                     mDeleteImg.setVisibility(VISIBLE);//可见
+                if (mOnTextChangeListener != null)
+                    mOnTextChangeListener.onTextChange(str);//文字变化
             }
 
             @Override
@@ -82,4 +84,13 @@ public class MyEditText extends RelativeLayout {
         return mEditText.getText().toString();
     }
 
+    public interface OnTextChangeListener {
+        void onTextChange(String st);
+    }
+
+    private OnTextChangeListener mOnTextChangeListener;//文本变化监听
+
+    public void setOnTextChangeListener(OnTextChangeListener onTextChangeListener) {
+        mOnTextChangeListener = onTextChangeListener;
+    }
 }

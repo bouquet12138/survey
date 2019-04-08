@@ -7,13 +7,20 @@ import android.os.Message;
 import android.text.TextUtils;
 
 import top.systemsec.survey.base.MVPBasePresenter;
+import top.systemsec.survey.base.NowUserInfo;
+import top.systemsec.survey.base.OnGetInfoListener;
+import top.systemsec.survey.bean.UserBean;
+import top.systemsec.survey.mobel.LoginModel;
 import top.systemsec.survey.view.ILoginView;
 
 public class LoginPresenter extends MVPBasePresenter<ILoginView> {
 
+    private LoginModel mLoginMode = new LoginModel();//登录model
+
     private final int SUCCESS = 0;//成功
     private final int PW_ERROR = 1;//账号或密码错误
     private final int NET_ERROR = 2;//网络错误
+    private final int COMPLETE = 3;//相应完成
 
     private Handler mHandler = new Handler() {
 
@@ -24,13 +31,18 @@ public class LoginPresenter extends MVPBasePresenter<ILoginView> {
 
             switch (msg.what) {
                 case SUCCESS:
-                    getView().hideLoading();//隐藏进度条
+                    getView().showToast("登录成功");
                     saveInfo();//保存用户信息
                     getView().enterMain();//进入主界面
                     break;
                 case PW_ERROR:
+                    getView().showToast("用户名或密码错误");
                     break;
                 case NET_ERROR:
+                    getView().showToast("网络错误");
+                    break;
+                case COMPLETE:
+                    getView().hideLoading();//隐藏进度条
                     break;
             }
         }
@@ -43,7 +55,29 @@ public class LoginPresenter extends MVPBasePresenter<ILoginView> {
         if (!isViewAttached())//没有绑定view直接返回
             return;
         getView().showLoading("登录中");
-        mHandler.sendEmptyMessageDelayed(SUCCESS, 1000);//TODO:测试用的记得删除
+        mLoginMode.login(getView().getAccount(), getView().getPassword(), new OnGetInfoListener<UserBean>() {
+            @Override
+            public void onSuccess(UserBean userBean) {
+
+                if (userBean == null)
+                    mHandler.sendEmptyMessage(PW_ERROR);//用户名或密码错误
+                else {
+                    mHandler.sendEmptyMessage(SUCCESS);//登录成功
+                    NowUserInfo.setUserBean(userBean);//设置一下当前用户
+                }
+
+            }
+
+            @Override
+            public void onFail() {
+                mHandler.sendEmptyMessage(NET_ERROR);// 网络错误
+            }
+
+            @Override
+            public void onComplete() {
+                mHandler.sendEmptyMessage(COMPLETE);//完成
+            }
+        });
     }
 
     /**
@@ -80,7 +114,7 @@ public class LoginPresenter extends MVPBasePresenter<ILoginView> {
         editor.putBoolean("isRemember", isRemember);//是否记住密码
         if (isRemember) {
             String account = getView().getAccount();//得到账号
-            String password = getView().getAccount();//得到账号
+            String password = getView().getPassword();//得到密码
             editor.putString("account", account);//账号
             editor.putString("password", password);//密码
         } else {

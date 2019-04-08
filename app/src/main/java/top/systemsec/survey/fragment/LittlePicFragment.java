@@ -2,7 +2,9 @@ package top.systemsec.survey.fragment;
 
 
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,7 +13,10 @@ import android.view.ViewGroup;
 
 import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.zip.InflaterInputStream;
@@ -43,8 +48,13 @@ public class LittlePicFragment extends Fragment {
      */
     private void initView() {
         mImgView = mView.findViewById(R.id.imgView);
-        mImgView.enable();//启用
-         Glide.with(getContext()).load(mImagePath).into(mImgView);//设置图片
+        Glide.with(getContext()).load(mImagePath).error(R.drawable.image_error_big).into(mImgView);//设置图片
+
+        File file = new File(mImagePath);
+        if (file.exists()){
+            mImgView.enable();//启用
+        }
+
     }
 
     public String getImagePath() {

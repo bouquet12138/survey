@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import top.systemsec.survey.R;
@@ -30,8 +32,10 @@ public class NewSurveyView extends LinearLayout {
      * 点位置信息
      */
     private TextView mLocText;
-    private EditText mNumberEdit;
-    private EditText mNameEdit;
+
+    private ViewGroup mNumberLinear;//编号
+
+    private EditText mPointNameEdit;
     private EditText mDetailAddressEdit;
     private EditText mLongitude;
     private EditText mLatitudeEdit;
@@ -67,9 +71,6 @@ public class NewSurveyView extends LinearLayout {
      */
     private EditText mRemarkEdit;
 
-    private Button mTempStorageBt;//暂存按钮
-    private Button mSubmitBt;//提交按钮
-
     private ImageSelectAdapter mImageSelectAdapter;
     private ImageSelectAdapter mImageSelectAdapter1;
     private ImageSelectAdapter mImageSelectAdapter2;
@@ -88,8 +89,10 @@ public class NewSurveyView extends LinearLayout {
         mBackImage = findViewById(R.id.backImage);//返回按钮
 
         mLocText = findViewById(R.id.locText);
-        mNumberEdit = findViewById(R.id.numberEdit);
-        mNameEdit = findViewById(R.id.pointNameEdit);
+        mNumberLinear = findViewById(R.id.numberLinear);//编号linear
+        mNumberLinear.setVisibility(GONE);//编号不可见
+
+        mPointNameEdit = findViewById(R.id.pointNameEdit);
         mDetailAddressEdit = findViewById(R.id.detailAddressEdit);
         mLongitude = findViewById(R.id.longitude);
         mLatitudeEdit = findViewById(R.id.latitudeEdit);
@@ -115,9 +118,42 @@ public class NewSurveyView extends LinearLayout {
         mSceneImgRecyclerView = findViewById(R.id.sceneImgRecyclerView);
 
         mRemarkEdit = findViewById(R.id.remarkEdit);
+    }
 
-        mTempStorageBt = findViewById(R.id.tempStorageBt);//暂存按钮
-        mSubmitBt = findViewById(R.id.submitBt);
+    public void initData(SurveyBean surveyBean) {
+        mPointNameEdit.setText(surveyBean.getPointName());//站点名称
+        if (!TextUtils.isEmpty(surveyBean.getPointName()))
+            mPointNameEdit.setSelection(surveyBean.getPointName().length());//光标位置
+        mDetailAddressEdit.setText(surveyBean.getDetailAddress());//详细地址
+        mLongitude.setText(surveyBean.getLongitude());//经度
+        mLatitudeEdit.setText(surveyBean.getLatitude());//纬度
+        mStreetSpinner.setNowStr(surveyBean.getStreet());//街道
+        mPoliceSpinner.setNowStr(surveyBean.getPolice());//警局
+
+        //摄像头信息
+        String installType = surveyBean.getCameraInstallType();
+
+        if (installType.equals("wallInstall"))//TODO:如果是壁挂安装
+            mWallRadio.setChecked(true);//选中壁挂安装
+
+        mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
+        mCrossArmNumEdit.setText(surveyBean.getCrossArmNum() + "");//横臂数
+        mDirEdit1.setText(surveyBean.getDir1());
+        mDirEdit2.setText(surveyBean.getDir2());
+        mFaceRecNumEdit.setText(surveyBean.getFaceRecNum() + "");//人脸识别数
+        mFaceLightNumEdit.setText(surveyBean.getFaceLightNum() + "");//人脸补光灯数
+
+        mCarNumRecNumEdit.setText(surveyBean.getCarNumRecNum() + "");//车牌识别监控头
+        mGlobalNumEdit.setText(surveyBean.getGlobalNum() + "");//环球监控数
+
+        mRemarkEdit.setText(surveyBean.getRemark());//备注
+    }
+
+    /**
+     * 隐藏定位
+     */
+    public void hideLocation() {
+        mLocText.setVisibility(GONE);//定位不可见
     }
 
     /**
@@ -129,9 +165,6 @@ public class NewSurveyView extends LinearLayout {
         mBackImage.setOnClickListener(onClickListener);
 
         mLocText.setOnClickListener(onClickListener);//定位
-
-        mSubmitBt.setOnClickListener(onClickListener);
-        mTempStorageBt.setOnClickListener(onClickListener);
     }
 
     /**
@@ -246,6 +279,7 @@ public class NewSurveyView extends LinearLayout {
      */
     public void setLongitude(String longitude) {
         mLongitude.setText(longitude);
+        mLongitude.setSelection(longitude.length());
     }
 
     /**
@@ -253,6 +287,7 @@ public class NewSurveyView extends LinearLayout {
      */
     public void setLatitude(String latitude) {
         mLatitudeEdit.setText(latitude);
+        mLatitudeEdit.setSelection(latitude.length());
     }
 
     /**
@@ -260,14 +295,7 @@ public class NewSurveyView extends LinearLayout {
      */
     public SurveyBean getSurveyInfo() {
 
-        String number = mNumberEdit.getText().toString();//编号
-
-        if (TextUtils.isEmpty(number)) {
-            Toast.makeText(getContext(), "编号不能为空", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-
-        String pointName = mNameEdit.getText().toString();//点位名称
+        String pointName = mPointNameEdit.getText().toString();//点位名称
         if (TextUtils.isEmpty(pointName)) {
             Toast.makeText(getContext(), "点位名称不能为空", Toast.LENGTH_SHORT).show();
             return null;
@@ -291,9 +319,19 @@ public class NewSurveyView extends LinearLayout {
             return null;
         }
 
-        String street = "";  //TODO:所属街道 还没数据
-        String police = "";   //TODO：派出所 还没数据
+        String street = mStreetSpinner.getNowStr();
 
+        if (TextUtils.isEmpty(street)) {//街道为空
+            Toast.makeText(getContext(), "请选择街道", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        String police = mPoliceSpinner.getNowStr();
+
+        if (TextUtils.isEmpty(police)) {//街道为空
+            Toast.makeText(getContext(), "请选择警局", Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
         String installType = "poleInstall";//TODO:立杆安装
         if (mWallRadio.isChecked())
@@ -388,7 +426,7 @@ public class NewSurveyView extends LinearLayout {
         String remark = mRemarkEdit.getText().toString();
 
         SurveyBean surveyBean = new SurveyBean(
-                number, pointName, detailAddress, longitude, latitude, street, police,//点位信息
+                pointName, detailAddress, longitude, latitude, street, police,//点位信息
                 installType, poleHigh, crossArmNum, dir1, dir2, faceRecNum, faceLightNum, carRecNum, globalNum,//摄像机信息
                 list, list1, list2, list3.get(0), list4.get(0),//图像信息
                 remark);//备注
