@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ public class NewSurveyView extends LinearLayout {
      */
     private TextView mLocText;
 
+    private ScrollView mScrollView;//滚动view
     private ViewGroup mNumberLinear;//编号
 
     private EditText mPointNameEdit;
@@ -87,6 +89,8 @@ public class NewSurveyView extends LinearLayout {
     public void initView() {
 
         mBackImage = findViewById(R.id.backImage);//返回按钮
+
+        mScrollView = findViewById(R.id.scrollView);//滚动View
 
         mLocText = findViewById(R.id.locText);
         mNumberLinear = findViewById(R.id.numberLinear);//编号linear
@@ -433,5 +437,24 @@ public class NewSurveyView extends LinearLayout {
 
         return surveyBean;
     }
+
+    /**
+     * 站点获取焦点
+     */
+    public void pointNameFocus() {
+        mScrollView.fullScroll(ScrollView.FOCUS_UP);//滑到顶部
+        mPointNameEdit.requestFocus();//请求焦点
+        mPointNameEdit.setHint("请输入点位名称");
+    }
+
+    /**
+     * 得到站点名称
+     *
+     * @return 得到站点名
+     */
+    public String getPointName() {
+        return mPointNameEdit.getText().toString();
+    }
+
 
 }

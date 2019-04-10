@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,25 +19,28 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.filter.Filter;
-import com.zhihu.matisse.internal.entity.CaptureStrategy;
-
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import top.systemsec.survey.base.MVPBaseActivity;
+import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.NewSurveyPresenter;
-import top.systemsec.survey.utils.GifSizeFilter;
-import top.systemsec.survey.utils.Glide4Engine;
 import top.systemsec.survey.R;
+import top.systemsec.survey.utils.LocalImageSave;
 import top.systemsec.survey.utils.MatisseUtil;
 import top.systemsec.survey.view.INewSurveyView;
 import top.systemsec.survey.view.NewSurveyView;
+
+import static top.systemsec.survey.utils.LocalImageSave.IMAGE_DAMAGE;
+import static top.systemsec.survey.utils.LocalImageSave.SAVE_FAIL;
+import static top.systemsec.survey.utils.LocalImageSave.SAVE_OK;
+import static top.systemsec.survey.utils.LocalImageSave.STORAGE_CARD_DISABLED;
 
 
 public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView {
@@ -77,6 +81,8 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         initListener();
         mNewSurveyPresenter = new NewSurveyPresenter();//支持
         mNewSurveyPresenter.attachView(this);//绑定一下
+
+        mNewSurveyPresenter.getStreetAndPoliceInfo();//获取警局和街道信息
     }
 
     /**
@@ -87,8 +93,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         mNewSurveyView.initView();//初始化view
 
         mTempStorageBt = findViewById(R.id.tempStorageBt);//暂存按钮
-        mSubmitBt = findViewById(R.id.submitBt);
-
+        mSubmitBt = findViewById(R.id.submitBt);//提交按钮
     }
 
     /**
@@ -100,13 +105,6 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         mNewSurveyView.initImageAdapter2(mImagePaths2);
         mNewSurveyView.initImageAdapter3(mImagePaths3);
         mNewSurveyView.initImageAdapter4(mImagePaths4);
-
-        String[] streets = this.getResources().getStringArray(R.array.streets);//街道
-        mNewSurveyView.initStreets(streets);//街道
-
-        String[] polices = this.getResources().getStringArray(R.array.polices);//警局
-        mNewSurveyView.initPolices(polices);//初始化警局
-
     }
 
     /**
@@ -138,6 +136,13 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
          * 添加图片监听
          */
         mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
+
+            String pointName = mNewSurveyView.getPointName();
+            if (TextUtils.isEmpty(pointName)) {
+                mNewSurveyView.pointNameFocus();//填写点位名称
+                return;
+            }
+
             mNowAddImgIndex = index;
             mMaxImgNum = maxNum;
             if (mMaxImgNum >= 0)
@@ -260,12 +265,36 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-            List<String> pathList = Matisse.obtainPathResult(data);
-            List<Uri> uriList = Matisse.obtainResult(data);
-            Log.d(TAG, "onActivityResult: uriList " + uriList);
-            Log.d(TAG, "onActivityResult: pathList " + pathList);
-            if (uriList.size() == 1)
-                NewSurveyActivity.this.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uriList.get(0)));
+            List<String> sourcePathList = Matisse.obtainPathResult(data);
+            Log.d(TAG, "onActivityResult: pathList " + sourcePathList);//源路径
+
+            List<String> pathList = new ArrayList<>();
+
+            for (String sourcePath : sourcePathList) {
+
+                String pointName = mNewSurveyView.getPointName();//站点名
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
+                String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
+
+
+                int state = LocalImageSave.moveImageToAlbum(sourcePath, pointName, fileName);
+
+                switch (state) {
+                    case IMAGE_DAMAGE:
+                        Toast.makeText(this, "图片破损", Toast.LENGTH_SHORT).show();
+                        break;
+                    case STORAGE_CARD_DISABLED:
+                        Toast.makeText(this, "手机内存不足", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SAVE_OK:
+                        pathList.add(LocalImageSave.sImagePath);//将路径添加进来
+                        break;
+                    case SAVE_FAIL:
+                        Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
 
             switch (mNowAddImgIndex) {
                 case 0:
@@ -329,6 +358,21 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
     }
 
     /**
+     * 初始化街道
+     *
+     * @param streets
+     */
+    @Override
+    public void initStreet(String[] streets) {
+        mNewSurveyView.initStreets(streets);//初始化街道
+    }
+
+    @Override
+    public void initPolice(String[] polices) {
+        mNewSurveyView.initPolices(polices);//初始化警局
+    }
+
+    /**
      * 定位
      */
     public class MyLocationListener extends BDAbstractLocationListener {
@@ -337,8 +381,6 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
             hideLoading();//隐藏dialog
             double longitude = bdLocation.getLongitude();
             double latitude = bdLocation.getLatitude();
-            Log.d(TAG, "onReceiveLocation: longitude " + longitude);
-            Log.d(TAG, "onReceiveLocation: latitude " + latitude);
             if (longitude == 4.9E-324 || latitude == 4.9E-324) {
                 Toast.makeText(NewSurveyActivity.this, "位置获取失败", Toast.LENGTH_SHORT).show();
             } else {
@@ -351,6 +393,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
 
     @Override
     protected void onDestroy() {
+        mNewSurveyPresenter.detachView();//解除绑定
         mLocationClient.stop();//停止
         super.onDestroy();
     }

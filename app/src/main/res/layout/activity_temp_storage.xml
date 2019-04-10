@@ -12,7 +12,7 @@
 
         <TextView
             style="@style/style_title"
-            android:text="站点管理" />
+            android:text="暂存信息" />
 
         <ImageView
             android:id="@+id/backImage"
@@ -51,7 +51,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
 
     </android.support.v7.widget.RecyclerView>
 

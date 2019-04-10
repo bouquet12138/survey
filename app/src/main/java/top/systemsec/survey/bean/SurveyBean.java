@@ -8,6 +8,9 @@ import java.util.List;
 
 public class SurveyBean extends LitePalSupport {
 
+    private String number;//编号
+    private boolean isUpLoadOk;//是否上传成功
+
     private String pointName;
     private String detailAddress;
     private String longitude;
@@ -31,11 +34,11 @@ public class SurveyBean extends LitePalSupport {
     /**
      * 图像信息
      */
-    private List<String> envImgList;
-    private List<String> overallViewList;
-    private List<String> closeShotList;
-    private String gpsImgList;
-    private String sceneImgList;
+    private List<ImageUploadState> envImgList;
+    private List<ImageUploadState> overallViewList;
+    private List<ImageUploadState> closeShotList;
+    private ImageUploadState gpsImgList;
+    private ImageUploadState sceneImgList;
     /**
      * 备注信息
      */
@@ -51,7 +54,7 @@ public class SurveyBean extends LitePalSupport {
 
     public SurveyBean(String pointName, String detailAddress, String longitude, String latitude, String street, String police,
                       String cameraInstallType, float poleHigh, int crossArmNum, String dir1, String dir2, int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum,
-                      List<String> envImgList, List<String> overallViewList, List<String> closeShotList, String gpsImgList, String sceneImgList,
+                      List<ImageUploadState> envImgList, List<ImageUploadState> overallViewList, List<ImageUploadState> closeShotList, ImageUploadState gpsImgList, ImageUploadState sceneImgList,
                       String remark) {
         this.pointName = pointName;
         this.detailAddress = detailAddress;
@@ -199,43 +202,59 @@ public class SurveyBean extends LitePalSupport {
         this.globalNum = globalNum;
     }
 
-    public List<String> getEnvImgList() {
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public boolean isUpLoadOk() {
+        return isUpLoadOk;
+    }
+
+    public void setUpLoadOk(boolean upLoadOk) {
+        isUpLoadOk = upLoadOk;
+    }
+
+    public List<ImageUploadState> getEnvImgList() {
         return envImgList;
     }
 
-    public void setEnvImgList(List<String> envImgList) {
+    public void setEnvImgList(List<ImageUploadState> envImgList) {
         this.envImgList = envImgList;
     }
 
-    public List<String> getOverallViewList() {
+    public List<ImageUploadState> getOverallViewList() {
         return overallViewList;
     }
 
-    public void setOverallViewList(List<String> overallViewList) {
+    public void setOverallViewList(List<ImageUploadState> overallViewList) {
         this.overallViewList = overallViewList;
     }
 
-    public List<String> getCloseShotList() {
+    public List<ImageUploadState> getCloseShotList() {
         return closeShotList;
     }
 
-    public void setCloseShotList(List<String> closeShotList) {
+    public void setCloseShotList(List<ImageUploadState> closeShotList) {
         this.closeShotList = closeShotList;
     }
 
-    public String getGpsImgList() {
+    public ImageUploadState getGpsImgList() {
         return gpsImgList;
     }
 
-    public void setGpsImgList(String gpsImgList) {
+    public void setGpsImgList(ImageUploadState gpsImgList) {
         this.gpsImgList = gpsImgList;
     }
 
-    public String getSceneImgList() {
+    public ImageUploadState getSceneImgList() {
         return sceneImgList;
     }
 
-    public void setSceneImgList(String sceneImgList) {
+    public void setSceneImgList(ImageUploadState sceneImgList) {
         this.sceneImgList = sceneImgList;
     }
 

@@ -1,5 +1,6 @@
 package top.systemsec.survey.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -88,6 +89,7 @@ public class LoginActivity extends MVPBaseActivity implements View.OnClickListen
 
     /**
      * 是否记住密码
+     *
      * @return
      */
     @Override
@@ -107,6 +109,7 @@ public class LoginActivity extends MVPBaseActivity implements View.OnClickListen
 
     /**
      * 设置光标
+     *
      * @param position
      */
     @Override
@@ -144,4 +147,14 @@ public class LoginActivity extends MVPBaseActivity implements View.OnClickListen
         mLoginPresenter.detachView();//解除绑定
         super.onDestroy();
     }
+
+    /**
+     * 跳转活动
+     *
+     * @param context
+     */
+    public static void actionStart(Context context) {
+        context.startActivity(new Intent(context, LoginActivity.class));//跳转到这里
+    }
+
 }

@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +45,7 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
 
         mTempStoragePresenter = new TempStoragePresenter();
         mTempStoragePresenter.attachView(this);
+
         mTempStoragePresenter.search();//刚上来就搜索一下
     }
 

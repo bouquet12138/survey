@@ -7,13 +7,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.io.File;
@@ -29,6 +34,7 @@ import top.systemsec.survey.activity.PictureViewActivity;
  */
 public class LittlePicFragment extends Fragment {
 
+    private static final String TAG = "LittlePicFragment";//加载成功
     protected View mView;
 
     private String mImagePath;//图片路径
@@ -48,12 +54,20 @@ public class LittlePicFragment extends Fragment {
      */
     private void initView() {
         mImgView = mView.findViewById(R.id.imgView);
-        Glide.with(getContext()).load(mImagePath).error(R.drawable.image_error_big).into(mImgView);//设置图片
+        Glide.with(getContext()).load(mImagePath).error(R.drawable.image_error_big).listener(new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                return false;
+            }
 
-        File file = new File(mImagePath);
-        if (file.exists()){
-            mImgView.enable();//启用
-        }
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                mImgView.enable();//启用
+                Log.d(TAG, "onResourceReady: ");
+                return false;
+            }
+        }).into(mImgView);//设置图片
+
 
     }
 

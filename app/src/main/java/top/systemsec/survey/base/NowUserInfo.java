@@ -14,7 +14,6 @@ public class NowUserInfo {
     private static UserBean sUserBean;//当前用户
 
     /**
-     * //TODO 这里还需要检查
      * 得到当前用户
      *
      * @return

@@ -1,14 +1,16 @@
 package top.systemsec.survey.mobel;
 
 import android.text.TextUtils;
+
 import org.litepal.LitePal;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import top.systemsec.survey.bean.SurveyBean;
 
-public class TempStorageModel {
+public class TempStorageShowModel {
 
     private List<SurveyBean> mSurveyBeans = new ArrayList<>();//查一次就够了不用反复查
 

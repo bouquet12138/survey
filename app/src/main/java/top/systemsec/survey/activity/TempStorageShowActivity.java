@@ -2,7 +2,6 @@ package top.systemsec.survey.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,13 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.systemsec.survey.R;
+import top.systemsec.survey.base.MVPBaseActivity;
 import top.systemsec.survey.bean.SurveyBean;
+import top.systemsec.survey.presenter.TempStorageShowPresenter;
 import top.systemsec.survey.utils.MatisseUtil;
+import top.systemsec.survey.view.ITempStorageShowView;
 import top.systemsec.survey.view.NewSurveyView;
 
-public class TempStorageShowActivity extends AppCompatActivity implements View.OnClickListener {
+public class TempStorageShowActivity extends MVPBaseActivity implements View.OnClickListener, ITempStorageShowView {
 
     private static final String TAG = "TempStorageShowActivity";
+
+    private TempStorageShowPresenter mTempStorageShowPresenter;
 
     private final int REQUEST_CODE_CHOOSE = 0;//选择图片
     private final int VIEW_PIC = 1;//查看图片
@@ -50,6 +54,10 @@ public class TempStorageShowActivity extends AppCompatActivity implements View.O
         initData();
         initAdapter();
         initListener();
+
+        mTempStorageShowPresenter = new TempStorageShowPresenter();
+        mTempStorageShowPresenter.attachView(this);//绑定View
+        mTempStorageShowPresenter.getStreetAndPoliceInfo();//从后台获取一下街道信息
     }
 
     /**
@@ -84,13 +92,13 @@ public class TempStorageShowActivity extends AppCompatActivity implements View.O
             finish();
             return;
         }
+
         mNewSurveyView.initData(surveyBean);//初始化数据
         mImagePaths.addAll(surveyBean.getEnvImgList());//数据
         mImagePaths1.addAll(surveyBean.getOverallViewList());//数据
         mImagePaths2.addAll(surveyBean.getCloseShotList());//数据
         mImagePaths3.add(surveyBean.getGpsImgList());//gps照
         mImagePaths4.add(surveyBean.getSceneImgList());//现场照
-
     }
 
     /**
@@ -102,13 +110,6 @@ public class TempStorageShowActivity extends AppCompatActivity implements View.O
         mNewSurveyView.initImageAdapter2(mImagePaths2);
         mNewSurveyView.initImageAdapter3(mImagePaths3);
         mNewSurveyView.initImageAdapter4(mImagePaths4);
-
-        String[] streets = this.getResources().getStringArray(R.array.streets);//街道
-        mNewSurveyView.initStreets(streets);//街道
-
-        String[] polices = this.getResources().getStringArray(R.array.polices);//警局
-        mNewSurveyView.initPolices(polices);//初始化警局
-
     }
 
     /**
@@ -247,5 +248,31 @@ public class TempStorageShowActivity extends AppCompatActivity implements View.O
         Intent intent = new Intent(context, TempStorageShowActivity.class);
         intent.putExtra("surveyBeanJson", surveyBeanJson);
         context.startActivity(intent);//开启Activity
+    }
+
+    /**
+     * 初始化街道
+     *
+     * @param streets
+     */
+    @Override
+    public void initStreet(String[] streets) {
+        mNewSurveyView.initStreets(streets);
+    }
+
+    /**
+     * 初始化警局
+     *
+     * @param polices
+     */
+    @Override
+    public void initPolice(String[] polices) {
+        mNewSurveyView.initPolices(polices);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mTempStorageShowPresenter.detachView();//解除绑定
+        super.onDestroy();
     }
 }

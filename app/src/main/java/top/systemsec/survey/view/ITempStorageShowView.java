@@ -2,9 +2,13 @@ package top.systemsec.survey.view;
 
 import android.content.res.Resources;
 
-import top.systemsec.survey.base.IMVPBaseView;
+import java.util.List;
 
-public interface INewSurveyView extends IMVPBaseView {
+import top.systemsec.survey.base.IMVPBaseView;
+import top.systemsec.survey.bean.SurveyBean;
+
+public interface ITempStorageShowView extends IMVPBaseView {
+
 
     /**
      * 初始化街道
@@ -26,5 +30,6 @@ public interface INewSurveyView extends IMVPBaseView {
      * @return
      */
     Resources getResources();
+
 
 }

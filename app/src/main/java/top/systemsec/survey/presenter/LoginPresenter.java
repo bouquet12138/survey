@@ -20,7 +20,7 @@ public class LoginPresenter extends MVPBasePresenter<ILoginView> {
     private final int SUCCESS = 0;//成功
     private final int PW_ERROR = 1;//账号或密码错误
     private final int NET_ERROR = 2;//网络错误
-    private final int COMPLETE = 3;//相应完成
+    private final int COMPLETE = 3;//响应完成
 
     private Handler mHandler = new Handler() {
 

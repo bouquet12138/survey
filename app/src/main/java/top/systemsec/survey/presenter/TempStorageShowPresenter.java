@@ -2,18 +2,20 @@ package top.systemsec.survey.presenter;
 
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
+
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBasePresenter;
-import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.base.OnGetInfoListener;
 import top.systemsec.survey.bean.StreetAndPolice;
-import top.systemsec.survey.bean.SurveyBean;
-import top.systemsec.survey.mobel.NewSurveyModel;
-import top.systemsec.survey.view.INewSurveyView;
 
-public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
+import top.systemsec.survey.mobel.NewSurveyModel;
+
+import top.systemsec.survey.view.ITempStorageShowView;
+
+public class TempStorageShowPresenter extends MVPBasePresenter<ITempStorageShowView> {
+
+    private NewSurveyModel mNewSurveyModel = new NewSurveyModel();//模型
 
     private final int SUCCESS = 0;//成功
     private final int NET_ERROR = 1;//网络错误
@@ -49,20 +51,6 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
         }
     };
 
-    private NewSurveyModel mNewSurveyModel = new NewSurveyModel();//模型
-
-    /**
-     * 保存surveyBean
-     *
-     * @param surveyBean
-     */
-    public void saveSurvey(SurveyBean surveyBean) {
-        if (surveyBean != null) {
-            mNewSurveyModel.saveSurvey(surveyBean);//保存一下
-            getView().showToast("数据保存成功");//数据保存成功
-        }
-    }
-
     /**
      * 得到街道警局信息
      */
@@ -70,7 +58,7 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
         if (!isViewAttached())//没有view绑定
             return;
 
-        //getView().showLoading("数据加载中");
+       // getView().showLoading("数据加载中");
 
         mNewSurveyModel.getStreetAndPolice(new OnGetInfoListener<StreetAndPolice>() {
             @Override
@@ -93,5 +81,6 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
         });
 
     }
+
 
 }

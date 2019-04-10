@@ -98,7 +98,7 @@
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
         android:text="修改密码"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@drawable/selector_text_color" />
 
     <View
         android:layout_width="match_parent"

@@ -10,10 +10,13 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_input"
         android:hint="请输入搜索关键字"
+        android:maxLines="1"
         android:paddingLeft="30dp"
         android:paddingTop="8dp"
+        android:imeOptions="actionSearch"
         android:paddingRight="30dp"
         android:paddingBottom="8dp"
+        android:singleLine="true"
         android:textSize="14dp" />
 
     <ImageView
@@ -30,6 +33,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
         android:src="@drawable/search" />
 
 </RelativeLayout>
