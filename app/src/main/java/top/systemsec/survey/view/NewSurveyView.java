@@ -22,6 +22,7 @@ import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.adapter.ImageSelectAdapter;
+import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.custom_view.SpinnerView;
 
@@ -192,7 +193,7 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化图片适配器
      */
-    public void initImageAdapter(List<String> imagePaths) {
+    public void initImageAdapter(List<ImageUploadState> imagePaths) {
         mImageSelectAdapter = new ImageSelectAdapter(imagePaths, getContext(), "环境照", 0, 8);
         mEnvImgRecyclerView.setAdapter(mImageSelectAdapter);
         mEnvImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
@@ -201,7 +202,7 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化全景照图片适配器
      */
-    public void initImageAdapter1(List<String> imagePaths) {
+    public void initImageAdapter1(List<ImageUploadState> imagePaths) {
         mImageSelectAdapter1 = new ImageSelectAdapter(imagePaths, getContext(), "全景照", 1, 2);
         mOverallViewRecyclerView.setAdapter(mImageSelectAdapter1);
         mOverallViewRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -210,7 +211,7 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化近照图片适配器
      */
-    public void initImageAdapter2(List<String> imagePaths) {
+    public void initImageAdapter2(List<ImageUploadState> imagePaths) {
         mImageSelectAdapter2 = new ImageSelectAdapter(imagePaths, getContext(), "近景照", 2, 2);
         mCloseShotRecyclerView.setAdapter(mImageSelectAdapter2);
         mCloseShotRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -219,7 +220,7 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化gps图片适配器
      */
-    public void initImageAdapter3(List<String> imagePaths) {
+    public void initImageAdapter3(List<ImageUploadState> imagePaths) {
         mImageSelectAdapter3 = new ImageSelectAdapter(imagePaths, getContext(), "gps照", 3, 1);
         mGpsImgRecyclerView.setAdapter(mImageSelectAdapter3);
         mGpsImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
@@ -228,7 +229,7 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化现场照图片适配器
      */
-    public void initImageAdapter4(List<String> imagePaths) {
+    public void initImageAdapter4(List<ImageUploadState> imagePaths) {
         mImageSelectAdapter4 = new ImageSelectAdapter(imagePaths, getContext(), "现场画面照", 4, 1);
         mSceneImgRecyclerView.setAdapter(mImageSelectAdapter4);
         mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
@@ -392,35 +393,35 @@ public class NewSurveyView extends LinearLayout {
         }
 
 
-        List<String> list = mImageSelectAdapter.getImagePaths();
+        List<ImageUploadState> list = mImageSelectAdapter.getImagePaths();
 
         if (list.size() != 8) {
             Toast.makeText(getContext(), "环境图片必须8张", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        List<String> list1 = mImageSelectAdapter1.getImagePaths();
+        List<ImageUploadState> list1 = mImageSelectAdapter1.getImagePaths();
 
         if (list1.size() != 2) {
             Toast.makeText(getContext(), "全景照必须2张", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        List<String> list2 = mImageSelectAdapter2.getImagePaths();
+        List<ImageUploadState> list2 = mImageSelectAdapter2.getImagePaths();
 
         if (list2.size() != 2) {
             Toast.makeText(getContext(), "近景照必须2张", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        List<String> list3 = mImageSelectAdapter3.getImagePaths();
+        List<ImageUploadState> list3 = mImageSelectAdapter3.getImagePaths();
 
         if (list3.size() != 1) {
             Toast.makeText(getContext(), "gps必须1张", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        List<String> list4 = mImageSelectAdapter4.getImagePaths();
+        List<ImageUploadState> list4 = mImageSelectAdapter4.getImagePaths();
 
         if (list4.size() != 1) {
             Toast.makeText(getContext(), "现场画面照必须1张", Toast.LENGTH_SHORT).show();
@@ -429,11 +430,17 @@ public class NewSurveyView extends LinearLayout {
 
         String remark = mRemarkEdit.getText().toString();
 
+        List<ImageUploadState> imageList = new ArrayList<>();
+        imageList.addAll(list);
+        imageList.addAll(list1);
+        imageList.addAll(list2);
+        imageList.addAll(list3);
+        imageList.addAll(list4);
+
         SurveyBean surveyBean = new SurveyBean(
                 pointName, detailAddress, longitude, latitude, street, police,//点位信息
                 installType, poleHigh, crossArmNum, dir1, dir2, faceRecNum, faceLightNum, carRecNum, globalNum,//摄像机信息
-                list, list1, list2, list3.get(0), list4.get(0),//图像信息
-                remark);//备注
+                imageList, remark);//备注
 
         return surveyBean;
     }

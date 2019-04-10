@@ -2,6 +2,7 @@ package top.systemsec.survey.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,16 +14,26 @@ import com.google.gson.Gson;
 import com.zhihu.matisse.Matisse;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBaseActivity;
+import top.systemsec.survey.base.NowUserInfo;
+import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.TempStorageShowPresenter;
+import top.systemsec.survey.utils.LocalImageSave;
 import top.systemsec.survey.utils.MatisseUtil;
 import top.systemsec.survey.view.ITempStorageShowView;
 import top.systemsec.survey.view.NewSurveyView;
+
+import static top.systemsec.survey.utils.LocalImageSave.IMAGE_DAMAGE;
+import static top.systemsec.survey.utils.LocalImageSave.SAVE_FAIL;
+import static top.systemsec.survey.utils.LocalImageSave.SAVE_OK;
+import static top.systemsec.survey.utils.LocalImageSave.STORAGE_CARD_DISABLED;
 
 public class TempStorageShowActivity extends MVPBaseActivity implements View.OnClickListener, ITempStorageShowView {
 
@@ -38,11 +49,11 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
 
     private NewSurveyView mNewSurveyView;
 
-    private List<String> mImagePaths = new ArrayList<>();
-    private List<String> mImagePaths1 = new ArrayList<>();
-    private List<String> mImagePaths2 = new ArrayList<>();
-    private List<String> mImagePaths3 = new ArrayList<>();
-    private List<String> mImagePaths4 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths1 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths2 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths3 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths4 = new ArrayList<>();
 
     private Button mSubmitBt, mCancelBt;//确定按钮 取消按钮
 
@@ -94,11 +105,29 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
         }
 
         mNewSurveyView.initData(surveyBean);//初始化数据
-        mImagePaths.addAll(surveyBean.getEnvImgList());//数据
-        mImagePaths1.addAll(surveyBean.getOverallViewList());//数据
-        mImagePaths2.addAll(surveyBean.getCloseShotList());//数据
-        mImagePaths3.add(surveyBean.getGpsImgList());//gps照
-        mImagePaths4.add(surveyBean.getSceneImgList());//现场照
+
+        List<ImageUploadState> imageList = surveyBean.getImgList();//得到存在本地的图片列表
+
+        if (imageList != null)
+            for (ImageUploadState image : imageList) {
+                switch (image.getImageArrId()) {
+                    case 0:
+                        mImagePaths.add(image);//环境照
+                        break;
+                    case 1:
+                        mImagePaths1.add(image);//全景照
+                        break;
+                    case 2:
+                        mImagePaths2.add(image);//近景照
+                        break;
+                    case 3:
+                        mImagePaths3.add(image);//gps照
+                        break;
+                    case 4:
+                        mImagePaths4.add(image);//现场画面照
+                        break;
+                }
+            }
     }
 
     /**
@@ -130,7 +159,7 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
                 selectImage();//从相册选择图片
         });
 
-        mNewSurveyView.initWatchImageListener((int index, String imageName, List<String> imageList, int imgIndex) -> {
+        mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
             mNowWatchImgIndex = index;//当前查看的图片索引
 
             Intent intent = new Intent(TempStorageShowActivity.this, PictureViewActivity.class);
@@ -175,7 +204,34 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-            List<String> pathList = Matisse.obtainPathResult(data);
+            List<String> sourcePathList = Matisse.obtainPathResult(data);
+
+            List<ImageUploadState> pathList = new ArrayList<>();
+
+            for (String sourcePath : sourcePathList) {
+
+                String pointName = mNewSurveyView.getPointName();//站点名
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
+                String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
+
+                int state = LocalImageSave.moveImageToAlbum(sourcePath, pointName, fileName);
+
+                switch (state) {
+                    case IMAGE_DAMAGE:
+                        Toast.makeText(this, "图片破损", Toast.LENGTH_SHORT).show();
+                        break;
+                    case STORAGE_CARD_DISABLED:
+                        Toast.makeText(this, "手机内存不足", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SAVE_OK:
+                        pathList.add(new ImageUploadState(mNowAddImgIndex, LocalImageSave.sImagePath));//将路径添加进来
+                        break;
+                    case SAVE_FAIL:
+                        Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
             switch (mNowAddImgIndex) {
                 case 0:
                     mImagePaths.addAll(pathList);
@@ -203,7 +259,7 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
         //查看图片
         if (requestCode == VIEW_PIC && resultCode == RESULT_OK) {
 
-            List<String> imageList = (List<String>) data.getSerializableExtra("imageList");//图片列表
+            List<ImageUploadState> imageList = (List<ImageUploadState>) data.getSerializableExtra("imageList");//图片列表
             Log.d(TAG, "onActivityResult: imageList " + imageList);
             switch (mNowWatchImgIndex) {
                 case 0:

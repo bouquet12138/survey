@@ -29,6 +29,7 @@ import java.util.List;
 
 import top.systemsec.survey.base.MVPBaseActivity;
 import top.systemsec.survey.base.NowUserInfo;
+import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.NewSurveyPresenter;
 import top.systemsec.survey.R;
@@ -56,11 +57,11 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
 
     private NewSurveyView mNewSurveyView;
 
-    private List<String> mImagePaths = new ArrayList<>();
-    private List<String> mImagePaths1 = new ArrayList<>();
-    private List<String> mImagePaths2 = new ArrayList<>();
-    private List<String> mImagePaths3 = new ArrayList<>();
-    private List<String> mImagePaths4 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths1 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths2 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths3 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths4 = new ArrayList<>();
 
     private int mNowAddImgIndex, mMaxImgNum;//当前图片索引 最大图片数
     private int mNowWatchImgIndex;//当前查看图片的索引
@@ -149,7 +150,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
                 selectImageAuthor();//从相册选择图片
         });
 
-        mNewSurveyView.initWatchImageListener((int index, String imageName, List<String> imageList, int imgIndex) -> {
+        mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
             mNowWatchImgIndex = index;//当前查看的图片索引
 
             Intent intent = new Intent(NewSurveyActivity.this, PictureViewActivity.class);
@@ -267,8 +268,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             List<String> sourcePathList = Matisse.obtainPathResult(data);
             Log.d(TAG, "onActivityResult: pathList " + sourcePathList);//源路径
-
-            List<String> pathList = new ArrayList<>();
+            List<ImageUploadState> pathList = new ArrayList<>();
 
             for (String sourcePath : sourcePathList) {
 
@@ -288,7 +288,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
                         Toast.makeText(this, "手机内存不足", Toast.LENGTH_SHORT).show();
                         break;
                     case SAVE_OK:
-                        pathList.add(LocalImageSave.sImagePath);//将路径添加进来
+                        pathList.add(new ImageUploadState(mNowAddImgIndex,LocalImageSave.sImagePath));//将路径添加进来
                         break;
                     case SAVE_FAIL:
                         Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
@@ -323,7 +323,8 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         //查看图片
         if (requestCode == VIEW_PIC && resultCode == RESULT_OK) {
 
-            List<String> imageList = (List<String>) data.getSerializableExtra("imageList");//图片列表
+            List<ImageUploadState> imageList = (List<ImageUploadState>) data.getSerializableExtra("imageList");//图片列表
+
             Log.d(TAG, "onActivityResult: imageList " + imageList);
             switch (mNowWatchImgIndex) {
                 case 0:

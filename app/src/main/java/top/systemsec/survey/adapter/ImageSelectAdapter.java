@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import top.systemsec.survey.R;
+import top.systemsec.survey.bean.ImageUploadState;
 
 public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.MyViewHolder> {
 
@@ -19,7 +20,7 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
     private static final int NORMAL_VIEW = 0;
     private static final int FOOT_VIEW = 1;
 
-    private List<String> mImagePaths;//图片路径
+    private List<ImageUploadState> mImagePaths;//图片路径
     private Context mContext;
 
     private int mIndex;//适配器的索引
@@ -34,7 +35,7 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      * @param index
      * @param maxImageNum
      */
-    public ImageSelectAdapter(List<String> imagePaths, Context context, String imageTitle, int index, int maxImageNum) {
+    public ImageSelectAdapter(List<ImageUploadState> imagePaths, Context context, String imageTitle, int index, int maxImageNum) {
         mImagePaths = imagePaths;
         mContext = context;
         mImageTitle = imageTitle;
@@ -62,7 +63,7 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
     public void onBindViewHolder(MyViewHolder holder, final int position) {
 
         if (getItemViewType(position) == NORMAL_VIEW) {
-            String imagePath = mImagePaths.get(position);
+            String imagePath = mImagePaths.get(position).getImagePath();
             Glide.with(mContext).load(imagePath).into(holder.imageView);//设置图片
             holder.deleteImage.setOnClickListener((v) -> {
                 mImagePaths.remove(position);
@@ -148,7 +149,7 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      * 图片点击监听
      */
     public interface OnImageClickListener {
-        void onClick(int index, String imageTitle, List<String> imgPath, int imgIndex);
+        void onClick(int index, String imageTitle, List<ImageUploadState> imgPath, int imgIndex);
     }
 
     private OnImageClickListener mOnImageClickListener;
@@ -167,7 +168,7 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      *
      * @return
      */
-    public List<String> getImagePaths() {
+    public List<ImageUploadState> getImagePaths() {
         return mImagePaths;
     }
 }

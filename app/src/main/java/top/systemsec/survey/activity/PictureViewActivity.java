@@ -19,6 +19,7 @@ import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.BaseActivity;
+import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.dialog.DeleteImageDialog;
 import top.systemsec.survey.fragment.LittlePicFragment;
 
@@ -57,7 +58,7 @@ public class PictureViewActivity extends BaseActivity {
     private void initData() {
         Bundle bundle = getIntent().getExtras();
         mImageName = bundle.getString("imageName");
-        List<String> imageList = (List<String>) bundle.getSerializable("imageList");//图片列表
+        List<ImageUploadState> imageList = (List<ImageUploadState>) bundle.getSerializable("imageList");//图片列表
         mImgIndex = bundle.getInt("imgIndex");//图片索引
 
         Log.d(TAG, "initData: " + imageList);
@@ -179,7 +180,7 @@ public class PictureViewActivity extends BaseActivity {
             finish();//销毁Activity
         else {
             Intent intent = new Intent();
-            List<String> imageList = new ArrayList<>();//图片路径
+            List<ImageUploadState> imageList = new ArrayList<>();//图片路径
             for (LittlePicFragment littlePicFragment : mFragments)
                 imageList.add(littlePicFragment.getImagePath());//添加图片路径
             intent.putExtra("imageList", (Serializable) imageList);

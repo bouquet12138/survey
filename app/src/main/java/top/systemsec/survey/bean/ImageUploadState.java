@@ -1,17 +1,24 @@
 package top.systemsec.survey.bean;
 
-public class ImageUploadState {
+import org.litepal.crud.LitePalSupport;
+
+import java.io.Serializable;
+
+public class ImageUploadState implements Serializable {
+
+    private int imageArrId;//这个图片属于哪个组
 
     private String imagePath;//图片路径
 
     private String imageUrl;//图片后台Url
 
-    private boolean isUploadOk;//是否上传成功
+    private boolean isUploadOk = false;//是否上传成功
 
-    public ImageUploadState(String imagePath, String imageUrl, boolean isUploadOk) {
+    private SurveyBean mSurveyBean;//勘察bean
+
+    public ImageUploadState(int imageArrId, String imagePath) {
+        this.imageArrId = imageArrId;
         this.imagePath = imagePath;
-        this.imageUrl = imageUrl;
-        this.isUploadOk = isUploadOk;
     }
 
     public String getImagePath() {
@@ -36,5 +43,29 @@ public class ImageUploadState {
 
     public void setUploadOk(boolean uploadOk) {
         isUploadOk = uploadOk;
+    }
+
+    public int getImageArrId() {
+        return imageArrId;
+    }
+
+    public void setImageArrId(int imageArrId) {
+        this.imageArrId = imageArrId;
+    }
+
+    public void setSurveyBean(SurveyBean surveyBean) {
+        mSurveyBean = surveyBean;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ImageUploadState{" +
+                "imageArrId=" + imageArrId +
+                ", imagePath='" + imagePath + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", isUploadOk=" + isUploadOk +
+                ", mSurveyBean=" + mSurveyBean +
+                '}';
     }
 }

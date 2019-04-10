@@ -1,7 +1,10 @@
 package top.systemsec.survey.mobel;
 
 import android.text.TextUtils;
+import android.util.Log;
+
 import org.litepal.LitePal;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +14,8 @@ import top.systemsec.survey.bean.SurveyBean;
 public class TempStorageModel {
 
     private List<SurveyBean> mSurveyBeans = new ArrayList<>();//查一次就够了不用反复查
+
+    private static final String TAG = "TempStorageModel";
 
     /**
      * 查找 TODO:暂存大小限制
@@ -23,6 +28,9 @@ public class TempStorageModel {
         if (mSurveyBeans.size() == 0) {//长度为空
             mSurveyBeans = LitePal.findAll(SurveyBean.class);
             Collections.reverse(mSurveyBeans);//倒叙反转一下
+
+            Log.d(TAG, "searchLocalSurveyBean: " + mSurveyBeans);
+
         }
 
         if (TextUtils.isEmpty(keyWord))

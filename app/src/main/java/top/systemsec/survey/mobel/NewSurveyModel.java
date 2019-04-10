@@ -8,12 +8,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import top.systemsec.survey.base.OnGetInfoListener;
 import top.systemsec.survey.base.ServerInfo;
+import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.StreetAndPolice;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.utils.OkHttpUtil;
@@ -66,7 +68,7 @@ public class NewSurveyModel {
                     onGetInfoListener.onFail();//网络错误
                 }
             }
-        },3);
+        }, 3);
 
     }
 

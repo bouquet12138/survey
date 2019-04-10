@@ -10,11 +10,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Random;
 
@@ -102,15 +100,24 @@ public class LocalImageSave {
 
         if (TextUtils.isEmpty(sourceFilePath))
             return SAVE_FAIL;
-
-        String fileSuffix = sourceFilePath.substring(sourceFilePath.lastIndexOf("."));
-        Log.d(TAG, "moveImageToAlbum: " + fileSuffix);//文件后缀
-
         String state = Environment.getExternalStorageState();
         //如果状态不是mounted，无法读写
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
             return STORAGE_CARD_DISABLED;//储存卡不可用
         }
+
+        if (sourceFilePath.contains("勘察宝")) {
+            File file = new File(sourceFilePath);
+            if (file.exists()) {
+                sImagePath = sourceFilePath;//源文件
+                return SAVE_OK;
+            } else
+                return IMAGE_DAMAGE;//图片破损
+        }
+
+        String fileSuffix = sourceFilePath.substring(sourceFilePath.lastIndexOf("."));
+        Log.d(TAG, "moveImageToAlbum: " + fileSuffix);//文件后缀
+
 
         File appRootDir = new File(Environment.getExternalStorageDirectory(), "勘察宝");//根文件
 

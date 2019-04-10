@@ -28,6 +28,7 @@ import java.util.zip.InflaterInputStream;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.activity.PictureViewActivity;
+import top.systemsec.survey.bean.ImageUploadState;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,7 +38,7 @@ public class LittlePicFragment extends Fragment {
     private static final String TAG = "LittlePicFragment";//加载成功
     protected View mView;
 
-    private String mImagePath;//图片路径
+    private ImageUploadState mImagePath;//图片路径
     private PhotoView mImgView;
 
     @Override
@@ -54,7 +55,7 @@ public class LittlePicFragment extends Fragment {
      */
     private void initView() {
         mImgView = mView.findViewById(R.id.imgView);
-        Glide.with(getContext()).load(mImagePath).error(R.drawable.image_error_big).listener(new RequestListener<Drawable>() {
+        Glide.with(getContext()).load(mImagePath.getImagePath()).error(R.drawable.image_error_big).listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 return false;
@@ -71,11 +72,11 @@ public class LittlePicFragment extends Fragment {
 
     }
 
-    public String getImagePath() {
+    public ImageUploadState getImagePath() {
         return mImagePath;
     }
 
-    public void setImagePath(String imagePath) {
+    public void setImagePath(ImageUploadState imagePath) {
         mImagePath = imagePath;
     }
 }
