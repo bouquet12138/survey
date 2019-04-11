@@ -16,6 +16,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okio.BufferedSink;
 
 /**
@@ -24,9 +25,11 @@ import okio.BufferedSink;
 
 public class OkHttpUtil {
 
-    public static final MediaType JSON=MediaType.parse("application/json; charset=utf-8");
+    private static final String TAG = "OkHttpUtil";
 
-    public static void sendOkHttpRequest(String address, okhttp3.Callback callback){
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    public static void sendOkHttpRequest(String address, okhttp3.Callback callback) {
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
         OkHttpClient client =
                 httpBuilder.connectTimeout(5, TimeUnit.SECONDS)
@@ -36,7 +39,7 @@ public class OkHttpUtil {
         client.newCall(request).enqueue(callback);
     }
 
-    public static void sendOkHttpRequest(String address, okhttp3.Callback callback, int outTime){
+    public static void sendOkHttpRequest(String address, okhttp3.Callback callback, int outTime) {
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
         OkHttpClient client =
                 httpBuilder.connectTimeout(outTime, TimeUnit.SECONDS)
@@ -49,21 +52,26 @@ public class OkHttpUtil {
 
     /**
      * 封装好的用于提交表单的类
+     *
      * @param address
      * @param keyAndValues
      * @param callback
      */
     public static void postOkHttpFormRequest(String address,
-                                         Map<String, String> keyAndValues, okhttp3.Callback callback){
+                                             Map<String, String> keyAndValues, okhttp3.Callback callback) {
         OkHttpClient client = new OkHttpClient();
         FormBody.Builder builder = new FormBody.Builder();
-        if (keyAndValues != null){
+        if (keyAndValues != null) {
             Iterator iterator = keyAndValues.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry<String, String> entry = (Map.Entry<String, String>)iterator.next();
+            while (iterator.hasNext()) {
+                Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
                 String key = entry.getKey();
                 String value = entry.getValue();
-                builder.add(key, value);
+                Log.d(TAG, "postOkHttpFormRequest: key " + key +" value " + value);
+                if (value != null)
+                    builder.add(key, value);
+                else
+                    builder.add(key, "");
             }
         }
         RequestBody requestBody = builder.build();
@@ -71,45 +79,45 @@ public class OkHttpUtil {
         client.newCall(request).enqueue(callback);
     }
 
-
-    //提交一组文件
-    public static void postForm(String address, Map<String, String> map, String fileHead, List<String> filesPath, okhttp3.Callback callback){
+    /**
+     * 上传图片
+     */
+    public static void postImage(String address, File file, okhttp3.Callback callback) {
 
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        if (filesPath != null && filesPath.size() != 0){
-            for (String filePath : filesPath){
-                File file ;
-                String fileName;
-                Log.d("HttpUtil ", "postImage: " + filePath);
-                if (!TextUtils.isEmpty(filePath)) {
-                    file = new File(filePath);
-                    if (file.exists()){
-                        //image/png
-                        fileName = file.getName();
-                        RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), file);
-                        requestBody.addFormDataPart(fileHead ,fileName, body);
-                    }
-                }
-            }
-        }
-        else{
-            requestBody.addFormDataPart(fileHead, "", new RequestBody() {
-                @Override
-                public MediaType contentType() {
-                    return null;
-                }
+        RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+        requestBody.addFormDataPart("fileName", "hello.jpg", body);
 
-                @Override
-                public void writeTo(BufferedSink sink) throws IOException {
+        Request request = new Request.Builder()
+                .url(address)
+                .post(requestBody.build())
+                .build();
+        okhttp3.OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
+        OkHttpClient okHttpClient =
+                httpBuilder.connectTimeout(5, TimeUnit.SECONDS)
+                        .writeTimeout(5, TimeUnit.SECONDS)
+                        .build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
 
-                }
-            });
-        }
+    /**
+     * 提交带文件的
+     *
+     * @param address
+     * @param map
+     * @param callback
+     */
+    public static void postForm(String address, Map<String, String> map, okhttp3.Callback callback) {
 
-        if (map != null){
-            for (Map.Entry<String, String> entry : map.entrySet()){
-                Log.d("OKHttpUtil", "postForm: " + entry.getKey() +"  " + entry.getValue());
-                requestBody.addFormDataPart(entry.getKey(), entry.getValue());
+        MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                Log.d("OKHttpUtil", "postForm: " + entry.getKey() + "  " + entry.getValue());
+                if (entry.getValue() != null)
+                    requestBody.addFormDataPart(entry.getKey(), entry.getValue());
+                else
+                    requestBody.addFormDataPart(entry.getKey(), "");
             }
         }
         Request request = new Request.Builder()
@@ -124,11 +132,11 @@ public class OkHttpUtil {
         okHttpClient.newCall(request).enqueue(callback);
     }
 
-    public static void postJson(String address, String json, okhttp3.Callback callback){
-       postJson(address, json, callback, 5);
+    public static void postJson(String address, String json, okhttp3.Callback callback) {
+        postJson(address, json, callback, 5);
     }
 
-    public static void postJson(String address, String json, okhttp3.Callback callback, int outTime){
+    public static void postJson(String address, String json, okhttp3.Callback callback, int outTime) {
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
         OkHttpClient okHttpClient =
                 httpBuilder.connectTimeout(outTime, TimeUnit.SECONDS)
@@ -144,7 +152,6 @@ public class OkHttpUtil {
                 .build();
         okHttpClient.newCall(request).enqueue(callback);
     }
-
 
 
 }

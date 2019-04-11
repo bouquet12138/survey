@@ -136,9 +136,9 @@ public class NewSurveyView extends LinearLayout {
         mPoliceSpinner.setNowStr(surveyBean.getPolice());//警局
 
         //摄像头信息
-        String installType = surveyBean.getCameraInstallType();
+        int installType = surveyBean.getCameraInstallType();
 
-        if (installType.equals("wallInstall"))//TODO:如果是壁挂安装
+        if (installType == 2)//TODO:如果是壁挂安装
             mWallRadio.setChecked(true);//选中壁挂安装
 
         mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
@@ -338,9 +338,9 @@ public class NewSurveyView extends LinearLayout {
             return null;
         }
 
-        String installType = "poleInstall";//TODO:立杆安装
+        int installType = 1;//TODO:立杆安装
         if (mWallRadio.isChecked())
-            installType = "wallInstall";//TODO:壁挂安装
+            installType = 2;//TODO:壁挂安装
 
         String poleHighStr = mPoleHighEdit.getText().toString();
         float poleHigh;//立杆

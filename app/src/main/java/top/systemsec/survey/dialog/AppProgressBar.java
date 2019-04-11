@@ -40,7 +40,7 @@ public class AppProgressBar extends Dialog {
                 WindowManager.LayoutParams.WRAP_CONTENT);
 
         layoutParams.x = 0;
-        layoutParams.y =  - DensityUtil.dipToPx(20);
+        layoutParams.y = -DensityUtil.dipToPx(20);
 
         hintText = findViewById(R.id.hintText);
         hintText.setText(hintStr);
@@ -51,8 +51,8 @@ public class AppProgressBar extends Dialog {
     /**
      * 全屏
      */
-    private  void fullScreen(){
-        if ( Build.VERSION.SDK_INT >= 19) {
+    private void fullScreen() {
+        if (Build.VERSION.SDK_INT >= 19) {
             View decorView = getWindow().getDecorView();
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -61,8 +61,7 @@ public class AppProgressBar extends Dialog {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-        else {
+        } else {
             View decorView = getWindow().getDecorView();
             int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(option);
@@ -72,8 +71,9 @@ public class AppProgressBar extends Dialog {
     /**
      * 设置提醒文本
      */
-    public void setHintText(String hint){
-        hintText.setText(hint);
+    public void setHintText(String hint) {
+        if (hintText != null)
+            hintText.setText(hint);
     }
 
 }

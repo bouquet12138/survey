@@ -27,4 +27,16 @@ public interface INewSurveyView extends IMVPBaseView {
      */
     Resources getResources();
 
+    /**
+     * 得到站点名称
+     *
+     * @return
+     */
+    String getPointName();
+
+    /**
+     * 重新启动当前activity
+     */
+    void reStart();
+
 }

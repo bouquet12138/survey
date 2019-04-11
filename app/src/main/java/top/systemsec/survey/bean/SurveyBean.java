@@ -19,7 +19,7 @@ public class SurveyBean extends LitePalSupport {
 
     private static final String TAG = "SurveyBean";
 
-    private String number;//编号
+    private String number = "0";//编号
     private boolean isUpLoadOk;//是否上传成功
 
     private String pointName;
@@ -32,7 +32,7 @@ public class SurveyBean extends LitePalSupport {
     /**
      * 摄像机信息
      */
-    private String cameraInstallType;
+    private int cameraInstallType;
     private float poleHigh;
     private int crossArmNum;
     private String dir1;
@@ -62,7 +62,7 @@ public class SurveyBean extends LitePalSupport {
     }
 
     public SurveyBean(String pointName, String detailAddress, String longitude, String latitude, String street, String police,
-                      String cameraInstallType, float poleHigh, int crossArmNum, String dir1, String dir2,
+                      int cameraInstallType, float poleHigh, int crossArmNum, String dir1, String dir2,
                       int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum, List<ImageUploadState> imgList, String remark) {
         this.pointName = pointName;
         this.detailAddress = detailAddress;
@@ -117,10 +117,18 @@ public class SurveyBean extends LitePalSupport {
     }
 
 
-    public String getCameraInstallType() {
+    public int getCameraInstallType() {
         return cameraInstallType;
     }
 
+    /**
+     * 设置图片列表
+     *
+     * @param imgList
+     */
+    public void setImgList(List<ImageUploadState> imgList) {
+        imgInfo = new Gson().toJson(imgList);
+    }
 
     public List<ImageUploadState> getImgList() {
 
@@ -172,7 +180,6 @@ public class SurveyBean extends LitePalSupport {
     }
 
 
-
     public String getRemark() {
         return remark;
     }
@@ -181,6 +188,47 @@ public class SurveyBean extends LitePalSupport {
         return saveTime;
     }
 
+    public void setSaveTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        this.saveTime = simpleDateFormat.format(new Date());
+    }
+
+    public void setSubmitTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        this.submitTime = simpleDateFormat.format(new Date());
+    }
+
+    public String getSubmitTime() {
+        return submitTime;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    /**
+     * 设置编号
+     *
+     * @param number
+     */
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    /**
+     * 设置是否上传成功
+     *
+     * @param upLoadOk
+     */
+    public void setUpLoadOk(boolean upLoadOk) {
+        isUpLoadOk = upLoadOk;
+    }
+
+    /**
+     * 数据信息
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return "SurveyBean{" +

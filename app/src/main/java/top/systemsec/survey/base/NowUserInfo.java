@@ -46,13 +46,13 @@ public class NowUserInfo {
      */
     public static void setUserBean(UserBean userBean) {
 
+        sUserBean = userBean;//应该在上面
+
         SharedPreferences sharedPreferences = MyApplication.getContext().
                 getSharedPreferences("nowUser", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("nowUserInfo", new Gson().toJson(sUserBean));
-        Log.d(TAG, "setUserBean: " + new Gson().toJson(sUserBean));
-        editor.apply();//应用一下
 
-        sUserBean = userBean;
+        editor.apply();//应用一下
     }
 }

@@ -25,6 +25,17 @@ public class MVPBaseActivity extends BaseActivity implements IMVPBaseView {
     }
 
     /**
+     * 设置对话框提示信息
+     *
+     * @param msg
+     */
+    @Override
+    public void setLoadingHint(String msg) {
+        if (appProgressBar != null)
+            appProgressBar.setHintText(msg);//设置提示信息
+    }
+
+    /**
      * 展示加载进度
      *
      * @param msg
@@ -33,8 +44,10 @@ public class MVPBaseActivity extends BaseActivity implements IMVPBaseView {
     public void showLoading(String msg) {
         if (!appProgressBar.isShowing()) {
             appProgressBar.show();
+            appProgressBar.setHintText(msg);//设置提示信息
         }
     }
+
 
     /**
      * 隐藏加载进度

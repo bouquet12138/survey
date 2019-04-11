@@ -1,14 +1,7 @@
 package top.systemsec.survey.activity;
 
-import android.Manifest;
+
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,33 +20,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import top.systemsec.survey.base.MVPBaseActivity;
 import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.NewSurveyPresenter;
 import top.systemsec.survey.R;
-import top.systemsec.survey.utils.LocalImageSave;
 import top.systemsec.survey.utils.MatisseUtil;
 import top.systemsec.survey.view.INewSurveyView;
 import top.systemsec.survey.view.NewSurveyView;
 
-import static top.systemsec.survey.utils.LocalImageSave.IMAGE_DAMAGE;
-import static top.systemsec.survey.utils.LocalImageSave.SAVE_FAIL;
-import static top.systemsec.survey.utils.LocalImageSave.SAVE_OK;
-import static top.systemsec.survey.utils.LocalImageSave.STORAGE_CARD_DISABLED;
 
-
-public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView {
+public class NewSurveyActivity extends NewSurveyPermissionActivity implements INewSurveyView {
 
     private NewSurveyPresenter mNewSurveyPresenter;//主持
     private static final String TAG = "NewSurveyActivity";
 
-    private final int REQUEST_CODE_CHOOSE = 0;//选择图片
-    private final int VIEW_PIC = 1;//查看图片
-
-    private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;//请求读取本地图片
-    private final int MY_PERMISSIONS_LOCATION_CODE = 1;//定位权限
+    private final int SELECT_PICTURE = 0;//选择图片
+    private final int VIEW_PICTURE = 1;//查看图片
 
     private NewSurveyView mNewSurveyView;
 
@@ -126,16 +109,16 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
 
         //提交
         mSubmitBt.setOnClickListener((v) -> {
-
+            SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
+            mNewSurveyPresenter.upLoadImage(surveyBean);
         });
+        //暂存
         mTempStorageBt.setOnClickListener((v) -> {
             SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-            mNewSurveyPresenter.saveSurvey(surveyBean);//保存一下
+            mNewSurveyPresenter.tempSave(surveyBean);//暂存一下
         });
 
-        /**
-         * 添加图片监听
-         */
+        //添加图片监听
         mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
 
             String pointName = mNewSurveyView.getPointName();
@@ -161,171 +144,45 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
             bundle.putInt("imgIndex", imgIndex);
             intent.putExtras(bundle);
 
-            startActivityForResult(intent, VIEW_PIC);//启动活动
+            startActivityForResult(intent, VIEW_PICTURE);//启动活动
         });
 
     }
 
     /**
-     * 请求权限的响应
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
-                // 从数组中取出返回结果
-                if (grantResults.length > 0) {
-                    for (int result : grantResults) {
-                        if (result != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(this, "用户拒绝权限无法打开相册", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    }
-                    selectImage();//从本地选择图片
-                }
-            }
-            break;
-            case MY_PERMISSIONS_LOCATION_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { // 权限被用户同意。执形我们想要的操作
-                    requestLocation();//请求定位
-                } else {
-                    Toast.makeText(this, "用户拒绝权限不能获取定位", Toast.LENGTH_SHORT).show();
-                }
-            }
-            break;
-
-        }
-    }
-
-
-    /**
-     * 从相册选择图片 权限
-     */
-    private void selectImageAuthor() {
-        List<String> permissionList = new ArrayList<>();//权限组
-        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);//读取权限
-        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);//写权限
-        if (ContextCompat.checkSelfPermission(NewSurveyActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-            permissionList.add(Manifest.permission.CAMERA);//相机权限
-
-        if (permissionList.size() != 0) {
-            // 如果用户已经拒绝了当前权限,shouldShowRequestPermissionRationale返回true，此时我们需要进行必要的解释和处理
-            for (String str : permissionList) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this, str)) {
-                    Toast.makeText(NewSurveyActivity.this, "用户拒绝了权限，不能读取本地图片，" +
-                            "请到设置界面打开", Toast.LENGTH_SHORT).show();
-                    return;//返回出去
-                }
-            }
-            ActivityCompat.requestPermissions(NewSurveyActivity.this,
-                    permissionList.toArray(new String[permissionList.size()]), MY_PERMISSIONS_REQUEST_READ_CONTACTS);//读取相册
-
-        } else {
-            selectImage();//从本地选择图片
-        }
-    }
-
-    /**
-     * 获取定位
-     */
-    private void obtainLocAuthor() {
-        //获取权限（如果没有开启权限，会弹出对话框，询问是否开启权限）
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //请求权限
-            if (ActivityCompat.shouldShowRequestPermissionRationale(NewSurveyActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Toast.makeText(NewSurveyActivity.this, "请前往设置界面打开定位权限", Toast.LENGTH_SHORT).show();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_LOCATION_CODE);//获取定位权限
-            }
-
-        } else {
-            requestLocation();//请求定位
-        }
-    }
-
-    /**
      * 从相册选择图片
      */
+    @Override
     public void selectImage() {
-        MatisseUtil.selectImage(NewSurveyActivity.this, mMaxImgNum, getResources(), REQUEST_CODE_CHOOSE);
+        MatisseUtil.selectImage(NewSurveyActivity.this, mMaxImgNum, getResources(), SELECT_PICTURE);
     }
 
     /**
      * 开始
      */
+    @Override
     public void requestLocation() {
         showLoading("定位获取中..");
         mLocationClient.restart();
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
+
+        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
             List<String> sourcePathList = Matisse.obtainPathResult(data);
-            Log.d(TAG, "onActivityResult: pathList " + sourcePathList);//源路径
-            List<ImageUploadState> pathList = new ArrayList<>();
-
-            for (String sourcePath : sourcePathList) {
-
-                String pointName = mNewSurveyView.getPointName();//站点名
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
-                String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
-
-
-                int state = LocalImageSave.moveImageToAlbum(sourcePath, pointName, fileName);
-
-                switch (state) {
-                    case IMAGE_DAMAGE:
-                        Toast.makeText(this, "图片破损", Toast.LENGTH_SHORT).show();
-                        break;
-                    case STORAGE_CARD_DISABLED:
-                        Toast.makeText(this, "手机内存不足", Toast.LENGTH_SHORT).show();
-                        break;
-                    case SAVE_OK:
-                        pathList.add(new ImageUploadState(mNowAddImgIndex,LocalImageSave.sImagePath));//将路径添加进来
-                        break;
-                    case SAVE_FAIL:
-                        Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-
-            switch (mNowAddImgIndex) {
-                case 0:
-                    mImagePaths.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter();
-                    break;
-                case 1:
-                    mImagePaths1.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter1();
-                    break;
-                case 2:
-                    mImagePaths2.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter2();
-                    break;
-                case 3:
-                    mImagePaths3.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter3();
-                    break;
-                case 4:
-                    mImagePaths4.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter4();
-                    break;
-            }
+            addImage(sourcePathList);
         }
 
-        //查看图片
-        if (requestCode == VIEW_PIC && resultCode == RESULT_OK) {
+        //region查看图片
+        if (requestCode == VIEW_PICTURE && resultCode == RESULT_OK) {
 
             List<ImageUploadState> imageList = (List<ImageUploadState>) data.getSerializableExtra("imageList");//图片列表
 
             Log.d(TAG, "onActivityResult: imageList " + imageList);
+
             switch (mNowWatchImgIndex) {
                 case 0:
                     mImagePaths.clear();
@@ -355,6 +212,7 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
             }
 
         }
+        //endregion
 
     }
 
@@ -372,6 +230,80 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
     public void initPolice(String[] polices) {
         mNewSurveyView.initPolices(polices);//初始化警局
     }
+
+    /**
+     * 站点名称
+     *
+     * @return
+     */
+    @Override
+    public String getPointName() {
+        return mNewSurveyView.getPointName();
+    }
+
+    /**
+     * 重启当前活动
+     */
+    @Override
+    public void reStart() {
+        Intent intent = getIntent();
+        overridePendingTransition(0, 0);//没有动画Z
+        finish();
+        overridePendingTransition(0, 0);//没有动画
+        startActivity(intent);
+    }
+
+    /**
+     * 添加图片
+     *
+     * @param sourcePathList
+     */
+    private void addImage(List<String> sourcePathList) {
+
+        int num = 1;//编号
+        String pointName = mNewSurveyView.getPointName();//站点名
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
+        String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
+
+        List<ImageUploadState> pathList = new ArrayList<>();
+
+        for (String imagePath : sourcePathList) {
+
+            File file = new File(imagePath);
+            if (!file.exists())//图片破损
+                continue;
+
+            ImageUploadState imageUploadState = new ImageUploadState(mNowAddImgIndex, imagePath);
+            imageUploadState.setImageName(fileName + "(" + num + ")");//文件名
+            pathList.add(imageUploadState);//添加
+            num++;//数字加加
+        }
+
+        switch (mNowAddImgIndex) {
+            case 0:
+                mImagePaths.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter();
+                break;
+            case 1:
+                mImagePaths1.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter1();
+                break;
+            case 2:
+                mImagePaths2.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter2();
+                break;
+            case 3:
+                mImagePaths3.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter3();
+                break;
+            case 4:
+                mImagePaths4.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter4();
+                break;
+        }
+
+    }
+
 
     /**
      * 定位
@@ -392,10 +324,14 @@ public class NewSurveyActivity extends MVPBaseActivity implements INewSurveyView
         }
     }
 
+    /**
+     * 销毁
+     */
     @Override
     protected void onDestroy() {
         mNewSurveyPresenter.detachView();//解除绑定
         mLocationClient.stop();//停止
         super.onDestroy();
     }
+
 }

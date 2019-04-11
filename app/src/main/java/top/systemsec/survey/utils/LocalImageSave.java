@@ -30,12 +30,13 @@ public class LocalImageSave {
     private LocalImageSave() {
     }
 
-    public static String sImagePath;//生成的图片路径
+    public static String sImagePath;//图片路径
 
     public static final int IMAGE_DAMAGE = 1;//图片破损
-    public static final int STORAGE_CARD_DISABLED = 2;//储存卡不可用
-    public static final int SAVE_OK = 3;//储存成功
-    public static final int SAVE_FAIL = 4;//保存失败
+    public static final int IMAGE_EXIST = 2;//图片存在
+    public static final int STORAGE_CARD_DISABLED = 3;//储存卡不可用
+    public static final int SAVE_OK = 4;//储存成功
+    public static final int SAVE_FAIL = 5;//保存失败
 
     private static final String TAG = "LocalImageSave";
 
@@ -89,7 +90,7 @@ public class LocalImageSave {
 
 
     /**
-     * 将图片移动到相册
+     * 将图片拷贝到相册
      *
      * @param sourceFilePath 源文件
      * @param albumName      相册名
@@ -104,15 +105,6 @@ public class LocalImageSave {
         //如果状态不是mounted，无法读写
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
             return STORAGE_CARD_DISABLED;//储存卡不可用
-        }
-
-        if (sourceFilePath.contains("勘察宝")) {
-            File file = new File(sourceFilePath);
-            if (file.exists()) {
-                sImagePath = sourceFilePath;//源文件
-                return SAVE_OK;
-            } else
-                return IMAGE_DAMAGE;//图片破损
         }
 
         String fileSuffix = sourceFilePath.substring(sourceFilePath.lastIndexOf("."));
@@ -131,13 +123,10 @@ public class LocalImageSave {
             dir.mkdir();
 
         File newFile = new File(dir, fileName + fileSuffix);
-
-        int num = 1;
-        while (newFile.exists() && num < Integer.MAX_VALUE - 1) {//循环起名
-            newFile = new File(dir, fileName + "(" + num + ")" + fileSuffix);//如果图片存在了，就换个名字
-            num++;
+        if (newFile.exists()) {
+            sImagePath = newFile.getAbsolutePath();//绝对路径
+            return IMAGE_EXIST;
         }
-
 
         FileOutputStream outputStream = null;
         try {
@@ -148,7 +137,6 @@ public class LocalImageSave {
             } else {
                 return IMAGE_DAMAGE;
             }
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return SAVE_FAIL;
@@ -161,12 +149,6 @@ public class LocalImageSave {
             }
 
         }
-
-        //TODO:这里可有可无主要是为了内存
-       /* if (!sourceFilePath.contains("勘察宝")) {
-            File file = new File(sourceFilePath);
-            file.delete();//删除图片
-        }*/
 
         //通知一下系统文件保存成功
         Uri uri = Uri.fromFile(newFile);
