@@ -1,6 +1,9 @@
 package top.systemsec.survey.view;
 
+import java.util.List;
+
 import top.systemsec.survey.base.IMVPBaseView;
+import top.systemsec.survey.bean.SurveyBean;
 
 public interface ISiteManageView extends IMVPBaseView {
 
@@ -10,5 +13,17 @@ public interface ISiteManageView extends IMVPBaseView {
      * @return
      */
     String getSearchInfo();
+
+    /**
+     * 设置搜索结果
+     */
+    void setSearchResult(List<SurveyBean> surveyBeans);
+
+    /**
+     * 没有数据
+     *
+     * @param show
+     */
+    void showNoData(boolean show);
 
 }

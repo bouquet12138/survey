@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
 import java.text.SimpleDateFormat;
@@ -19,28 +20,34 @@ public class SurveyBean extends LitePalSupport {
 
     private static final String TAG = "SurveyBean";
 
-    private String number = "0";//编号
+    @Column(unique = true, defaultValue = "0")
+    private long uniqueId = 0;//本地唯一编号
     private boolean isUpLoadOk;//是否上传成功
 
-    private String pointName;
-    private String detailAddress;
-    private String longitude;
-    private String latitude;
-    private String street;
-    private String police;
+    private String number = "0";//后台编号
+
+    /**
+     * 点位信息
+     */
+    private String pointName;//站点名
+    private String detailAddress;//详细地址
+    private String longitude;//经度
+    private String latitude;//纬度
+    private String street;//街道
+    private String police;//派出所
 
     /**
      * 摄像机信息
      */
-    private int cameraInstallType;
-    private float poleHigh;
-    private int crossArmNum;
-    private String dir1;
-    private String dir2;
-    private int faceRecNum;
-    private int faceLightNum;
-    private int carNumRecNum;
-    private int globalNum;
+    private int cameraInstallType;//安装方式
+    private float poleHigh;//立杆高
+    private int crossArmNum;//横臂数
+    private String dir1;//方向1
+    private String dir2;//方向2
+    private int faceRecNum;//人脸别监控数
+    private int faceLightNum;//人脸补光灯数
+    private int carNumRecNum;//车牌识别数
+    private int globalNum;//环球监控头
 
     /**
      * 图像信息
@@ -56,6 +63,9 @@ public class SurveyBean extends LitePalSupport {
      */
     private String saveTime;//保存时间
 
+    /**
+     * 提交时间
+     */
     private String submitTime;//提交时间
 
     public SurveyBean() {
@@ -232,6 +242,7 @@ public class SurveyBean extends LitePalSupport {
     @Override
     public String toString() {
         return "SurveyBean{" +
+                "id" + getBaseObjId() + "" +
                 "number='" + number + '\'' +
                 ", isUpLoadOk=" + isUpLoadOk +
                 ", pointName='" + pointName + '\'' +
@@ -255,4 +266,21 @@ public class SurveyBean extends LitePalSupport {
                 ", submitTime='" + submitTime + '\'' +
                 '}';
     }
+
+    /**
+     * 得到唯一id
+     */
+    public long getUniqueId() {
+        return uniqueId;
+    }
+
+    /**
+     * 设置唯一id
+     *
+     * @param uniqueId
+     */
+    public void setUniqueId(long uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
 }

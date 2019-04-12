@@ -35,6 +35,13 @@ public interface IMVPBaseView {
     void showToast(String msg);
 
     /**
+     * 显示长提示
+     *
+     * @param msg
+     */
+    void showLongToast(String msg);
+
+    /**
      * 获取上下文
      *
      * @return 上下文

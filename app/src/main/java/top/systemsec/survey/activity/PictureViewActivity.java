@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,8 +30,10 @@ public class PictureViewActivity extends BaseActivity {
 
     private boolean mHasDelete;//是否删除过图片
 
+    private boolean mShowDelete;//是否展示删除
     private String mImageName;
     private int mImgIndex;
+
 
     private ImageView mBackImage;
     private ImageView mDeleteImg;
@@ -57,15 +60,18 @@ public class PictureViewActivity extends BaseActivity {
      */
     private void initData() {
         Bundle bundle = getIntent().getExtras();
+
+        mShowDelete = bundle.getBoolean("showDelete", true);//默认是展示
         mImageName = bundle.getString("imageName");
         List<ImageUploadState> imageList = (List<ImageUploadState>) bundle.getSerializable("imageList");//图片列表
         mImgIndex = bundle.getInt("imgIndex");//图片索引
+        String imgHead = bundle.getString("imgHead");//图片头
 
         Log.d(TAG, "initData: " + imageList);
 
         for (int i = 0; i < imageList.size(); i++) {
             LittlePicFragment littlePicFragment = new LittlePicFragment();
-            littlePicFragment.setImagePath(imageList.get(i));
+            littlePicFragment.setImagePath(imageList.get(i), imgHead);
             mFragments.add(littlePicFragment);//添加碎片
         }
 
@@ -78,6 +84,9 @@ public class PictureViewActivity extends BaseActivity {
         mBackImage = findViewById(R.id.backImage);
         mDeleteImg = findViewById(R.id.deleteImg);
         mViewPager = findViewById(R.id.viewPager);
+
+        if (!mShowDelete)
+            mDeleteImg.setVisibility(View.GONE);//不可见
 
         mTitleTextView = findViewById(R.id.titleTextView);
         mDeleteImageDialog = new DeleteImageDialog(PictureViewActivity.this);
@@ -102,9 +111,10 @@ public class PictureViewActivity extends BaseActivity {
         mBackImage.setOnClickListener((v) -> {
             back();
         });
-        mDeleteImg.setOnClickListener((v) -> {
-            mDeleteImageDialog.show();//删除图片对话框显示
-        });
+        if (mShowDelete)//如果不展示也不设置监听
+            mDeleteImg.setOnClickListener((v) -> {
+                mDeleteImageDialog.show();//删除图片对话框显示
+            });
 
         mDeleteImageDialog.setOnDeleteClickListener(() -> {
             mFragments.remove(mImgIndex);

@@ -21,21 +21,11 @@
             android:textColor="#000"
             android:textSize="23dp" />
 
-        <TextView
-            android:id="@+id/locText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableRight="@drawable/little_loc"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:text="点击获取定位 "
-            android:textColor="@drawable/selector_text_color" />
 
     </LinearLayout>
 
     <!--编号-->
     <LinearLayout
-        android:id="@+id/numberLinear"
         style="@style/style_survey_linear">
 
         <top.systemsec.survey.custom_view.MyHintTextView
@@ -44,7 +34,7 @@
 
         <TextView
             android:id="@+id/numberText"
-            style="@style/style_point_info_edit" />
+            style="@style/style_point_info_fix_text"  />
 
     </LinearLayout>
 
@@ -55,9 +45,9 @@
             style="@style/style_point_info_text"
             android:text="点位名称" />
 
-        <EditText
+        <TextView
             android:id="@+id/pointNameEdit"
-            style="@style/style_point_info_edit" />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 
@@ -68,9 +58,9 @@
             style="@style/style_point_info_text"
             android:text="详细地址" />
 
-        <EditText
+        <TextView
             android:id="@+id/detailAddressEdit"
-            style="@style/style_point_info_edit" />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 
@@ -81,11 +71,9 @@
             style="@style/style_point_info_text"
             android:text="经度" />
 
-        <EditText
+        <TextView
             android:id="@+id/longitude"
-            style="@style/style_point_info_edit"
-            android:digits="0123456789.-eEwW"
-            android:inputType="number" />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 
@@ -96,11 +84,9 @@
             style="@style/style_point_info_text"
             android:text="纬度" />
 
-        <EditText
+        <TextView
             android:id="@+id/latitudeEdit"
-            style="@style/style_point_info_edit"
-            android:digits="0123456789.-sSnN"
-            android:inputType="number" />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 
@@ -111,11 +97,9 @@
             style="@style/style_point_info_text"
             android:text="所属街道" />
 
-        <top.systemsec.survey.custom_view.SpinnerView
+        <TextView
             android:id="@+id/streetSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 
@@ -126,12 +110,9 @@
             style="@style/style_point_info_text"
             android:text="派出所" />
 
-        <top.systemsec.survey.custom_view.SpinnerView
+        <TextView
             android:id="@+id/policeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-             />
+            style="@style/style_point_info_fix_text" />
 
     </LinearLayout>
 

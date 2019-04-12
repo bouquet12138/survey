@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.NewSurveyPresenter;
@@ -31,6 +30,9 @@ import top.systemsec.survey.view.NewSurveyView;
 
 
 public class NewSurveyActivity extends NewSurveyPermissionActivity implements INewSurveyView {
+
+    private boolean mCanSelect;//是否可以选择图片
+    private boolean mCanViewPic;//是否可以左右查看图片
 
     private NewSurveyPresenter mNewSurveyPresenter;//主持
     private static final String TAG = "NewSurveyActivity";
@@ -58,11 +60,14 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_survey);
+
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
+
         initView();
         initAdapter();
         initListener();
+
         mNewSurveyPresenter = new NewSurveyPresenter();//支持
         mNewSurveyPresenter.attachView(this);//绑定一下
 
@@ -107,25 +112,31 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
                 }
         );
 
-        //提交
+        /**
+         * 提交
+         */
         mSubmitBt.setOnClickListener((v) -> {
             SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-            mNewSurveyPresenter.upLoadImage(surveyBean);
+            if (surveyBean != null)//TODO:不要忘记非空判断啊
+                mNewSurveyPresenter.upLoadImage(surveyBean);
         });
-        //暂存
+        /**
+         * 暂存
+         */
         mTempStorageBt.setOnClickListener((v) -> {
             SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-            mNewSurveyPresenter.tempSave(surveyBean);//暂存一下
+            if (surveyBean != null)//TODO:不要忘记非空判断啊
+                mNewSurveyPresenter.tempSave(surveyBean);//暂存一下
         });
 
-        //添加图片监听
+        /**
+         * 添加图片监听
+         */
         mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
 
-            String pointName = mNewSurveyView.getPointName();
-            if (TextUtils.isEmpty(pointName)) {
-                mNewSurveyView.pointNameFocus();//填写点位名称
+            if (!mCanSelect)
                 return;
-            }
+            mCanSelect = false;//不可以选择
 
             mNowAddImgIndex = index;
             mMaxImgNum = maxNum;
@@ -134,8 +145,12 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         });
 
         mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
-            mNowWatchImgIndex = index;//当前查看的图片索引
 
+            if (!mCanViewPic)//如果不可以查看图片
+                return;
+            mCanViewPic = false;//不可以查看
+
+            mNowWatchImgIndex = index;//当前查看的图片索引
             Intent intent = new Intent(NewSurveyActivity.this, PictureViewActivity.class);
 
             Bundle bundle = new Bundle();
@@ -246,11 +261,21 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
      */
     @Override
     public void reStart() {
-        Intent intent = getIntent();
-        overridePendingTransition(0, 0);//没有动画Z
-        finish();
-        overridePendingTransition(0, 0);//没有动画
-        startActivity(intent);
+
+        SurveyBean surveyBean = new SurveyBean();
+        mNewSurveyView.initData(surveyBean);//设置一下数据
+        mNewSurveyView.clearData();//清除下数据
+        mNewSurveyView.pointNameFocus();//滚动最上面去
+        mImagePaths.clear();
+        mImagePaths1.clear();
+        mImagePaths2.clear();
+        mImagePaths3.clear();
+        mImagePaths4.clear();
+        mNewSurveyView.notifyImgAdapter();
+        mNewSurveyView.notifyImgAdapter1();
+        mNewSurveyView.notifyImgAdapter2();
+        mNewSurveyView.notifyImgAdapter3();
+        mNewSurveyView.notifyImgAdapter4();
     }
 
     /**
@@ -261,9 +286,8 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
     private void addImage(List<String> sourcePathList) {
 
         int num = 1;//编号
-        String pointName = mNewSurveyView.getPointName();//站点名
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
-        String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
+        String fileName = simpleDateFormat.format(new Date());//文件名
 
         List<ImageUploadState> pathList = new ArrayList<>();
 
@@ -334,4 +358,14 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         super.onDestroy();
     }
 
+    /**
+     * 在栈顶
+     */
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume: ");
+        mCanSelect = true;//可以选择图片了
+        mCanViewPic = true;//可以查看图片
+        super.onResume();
+    }
 }

@@ -2,7 +2,6 @@ package top.systemsec.survey.bean;
 
 import android.text.TextUtils;
 
-import org.litepal.crud.LitePalSupport;
 
 import java.io.Serializable;
 

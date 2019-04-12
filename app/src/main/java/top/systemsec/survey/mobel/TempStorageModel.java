@@ -18,7 +18,7 @@ public class TempStorageModel {
     private static final String TAG = "TempStorageModel";
 
     /**
-     * 查找 TODO:暂存大小限制
+     * 查找
      *
      * @param keyWord
      * @return
@@ -26,7 +26,7 @@ public class TempStorageModel {
     public List<SurveyBean> searchLocalSurveyBean(String keyWord) {
 
         if (mSurveyBeans.size() == 0) {//长度为空
-            mSurveyBeans = LitePal.findAll(SurveyBean.class);
+            mSurveyBeans = LitePal.where("isUpLoadOk = ?", "0").find(SurveyBean.class);//未上传成功的
             Collections.reverse(mSurveyBeans);//倒叙反转一下
 
             Log.d(TAG, "searchLocalSurveyBean: " + mSurveyBeans);
@@ -46,5 +46,14 @@ public class TempStorageModel {
             return surveyBeans;
         }
     }
+
+    /**
+     * 刷新数据
+     */
+    public List<SurveyBean> refreshData(String keyWord) {
+        mSurveyBeans.clear();//清除数据
+        return searchLocalSurveyBean(keyWord);//搜索
+    }
+
 }
 

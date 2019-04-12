@@ -126,4 +126,23 @@ public class ImageList {
         return str;
     }
 
+    public List<ImageUploadState> getImagePaths() {
+        return mImagePaths;
+    }
+
+    public List<ImageUploadState> getImagePaths1() {
+        return mImagePaths1;
+    }
+
+    public List<ImageUploadState> getImagePaths2() {
+        return mImagePaths2;
+    }
+
+    public List<ImageUploadState> getImagePaths3() {
+        return mImagePaths3;
+    }
+
+    public List<ImageUploadState> getImagePaths4() {
+        return mImagePaths4;
+    }
 }

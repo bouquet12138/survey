@@ -112,8 +112,12 @@ public class SpinnerView extends LinearLayout {
      */
     public void setNowStr(String nowStr) {
         mNowStr = nowStr;
-        if (mSpinnerText != null)
-            mSpinnerText.setText(mNowStr);//设置名称
+        if (mSpinnerText != null) {
+            if (!TextUtils.isEmpty(nowStr)) {
+                mSpinnerText.setText(mNowStr);//设置名称
+            }else
+                mSpinnerText.setText("请选择");//设为请选择
+        }
     }
 
     /**

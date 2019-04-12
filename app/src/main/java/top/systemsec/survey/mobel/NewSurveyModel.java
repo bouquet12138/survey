@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,7 +43,7 @@ public class NewSurveyModel {
      * @param bean   要上传的勘察bean
      * @param hasImg 是否有图片
      */
-    public void uploadDataNoImage(SurveyBean bean, boolean hasImg, OnGetInfoListener<String> onGetInfoListener) {
+    public void uploadSurveyInfo(SurveyBean bean, boolean hasImg, OnGetInfoListener<String> onGetInfoListener) {
 
         String address = ServerInfo.SERVER_IP + "/Exploit/add";
 
@@ -95,7 +96,6 @@ public class NewSurveyModel {
         OkHttpUtil.postOkHttpFormRequest(address, maps, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                onGetInfoListener.onComplete();//成功
                 onGetInfoListener.onFail();
             }
 
@@ -163,18 +163,36 @@ public class NewSurveyModel {
     /**
      * 保存勘察
      */
-    public void saveSurveyToLocal(SurveyBean surveyBean) {
+    public void saveSurveyToLocal(SurveyBean surveyBean) {//TODO:这里要好好检查
         if (surveyBean != null) {
-            String number = surveyBean.getNumber();
-            if (number.equals("0"))
-                surveyBean.save();//保存surveyBean
-            else {
-                List<SurveyBean> surveyBeanList = LitePal.where("number = ?", number).find(SurveyBean.class);
-                if (surveyBeanList != null && surveyBeanList.size() > 0)
-                    surveyBean.updateAll("number = ?", number);//更新一下
-                else
-                    surveyBean.save();//保存一下
+            Random random = new Random();
+            long uniqueId = random.nextInt(Integer.MAX_VALUE) + 1;
+            List<SurveyBean> surveyBeanList = LitePal.where("uniqueId = ?", uniqueId + "").find(SurveyBean.class);
+            while (surveyBeanList != null && surveyBeanList.size() > 0) {
+                uniqueId = random.nextInt(Integer.MAX_VALUE) + 1;
+                surveyBeanList = LitePal.where("uniqueId = ?", uniqueId + "").find(SurveyBean.class);
             }
+            surveyBean.setUniqueId(uniqueId);//设置一个id
+            surveyBean.save();
+        }
+    }
+
+    /**
+     * 唯一id法保存勘察
+     */
+    public void saveSurveyUnique(SurveyBean surveyBean) {//TODO:可能有bug 还要检查
+        if (surveyBean != null) {
+            long uniqueId = surveyBean.getUniqueId();
+
+            if (uniqueId == 0)
+                Log.e(TAG, "saveSurveyUnique: uniqueId 不合法 ");
+
+            List<SurveyBean> surveyBeanList = LitePal.where("uniqueId = ?", uniqueId + "").find(SurveyBean.class);
+            if (surveyBeanList != null && surveyBeanList.size() > 0)
+                surveyBean.updateAll("uniqueId = ?", uniqueId + "");//更新一下
+            else
+                surveyBean.save();//保存一下
+
         }
     }
 

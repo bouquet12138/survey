@@ -27,4 +27,20 @@ public class TempStoragePresenter extends MVPBasePresenter<ITempStorageView> {
         getView().setSearchResult(surveyBeans);//设置搜索到的信息
     }
 
+    /**
+     * 刷新一下数据
+     */
+    public void refresh() {
+        if (!isViewAttached())//没有view绑定
+            return;
+        String keyWord = getView().getSearchInfo();//得到用户搜索信息
+        List<SurveyBean> surveyBeans = mTempStorageModel.refreshData(keyWord);//搜索一下
+        if (surveyBeans == null || surveyBeans.size() == 0)
+            getView().showNoData(true);//展示没数据
+        else {
+            getView().showNoData(false);//隐藏
+        }
+        getView().setSearchResult(surveyBeans);//设置搜索到的信息
+    }
+
 }

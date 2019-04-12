@@ -68,6 +68,16 @@
         <item name="android:imeOptions">actionNext</item>
     </style>
 
+    <!--固定不变页面的样式-->
+    <style name="style_point_info_fix_text">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:background">@drawable/selector_input</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
     <style name="style_point_info_text">
         <item name="android:layout_width">100dp</item>
         <item name="android:layout_height">wrap_content</item>

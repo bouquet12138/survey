@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,13 +139,16 @@ public class NewSurveyView extends LinearLayout {
         //摄像头信息
         int installType = surveyBean.getCameraInstallType();
 
-        if (installType == 2)//TODO:如果是壁挂安装
+        if (installType == 2)
             mWallRadio.setChecked(true);//选中壁挂安装
 
         mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
         mCrossArmNumEdit.setText(surveyBean.getCrossArmNum() + "");//横臂数
+
+
         mDirEdit1.setText(surveyBean.getDir1());
         mDirEdit2.setText(surveyBean.getDir2());
+
         mFaceRecNumEdit.setText(surveyBean.getFaceRecNum() + "");//人脸识别数
         mFaceLightNumEdit.setText(surveyBean.getFaceLightNum() + "");//人脸补光灯数
 
@@ -152,6 +156,21 @@ public class NewSurveyView extends LinearLayout {
         mGlobalNumEdit.setText(surveyBean.getGlobalNum() + "");//环球监控数
 
         mRemarkEdit.setText(surveyBean.getRemark());//备注
+    }
+
+    /**
+     * 清除数据
+     * 慎用
+     */
+    public void clearData() {
+        mPoleHighEdit.setText("");//立杆高度
+        mCrossArmNumEdit.setText("");//横臂数
+        mFaceRecNumEdit.setText("");//人脸识别数
+        mFaceLightNumEdit.setText("");//人脸补光灯数
+
+        mCarNumRecNumEdit.setText("");//车牌识别监控头
+        mGlobalNumEdit.setText("");//环球监控数
+        mPointNameEdit.setText("");//设一下
     }
 
     /**
@@ -338,9 +357,9 @@ public class NewSurveyView extends LinearLayout {
             return null;
         }
 
-        int installType = 1;//TODO:立杆安装
+        int installType = 1;
         if (mWallRadio.isChecked())
-            installType = 2;//TODO:壁挂安装
+            installType = 2;
 
         String poleHighStr = mPoleHighEdit.getText().toString();
         float poleHigh;//立杆
@@ -351,6 +370,7 @@ public class NewSurveyView extends LinearLayout {
             try {
                 poleHigh = Float.parseFloat(poleHighStr);//解析一下字符串
             } catch (NumberFormatException e) {
+                mPoleHighEdit.requestFocus();//请求一下焦点
                 Toast.makeText(getContext(), "请输入正确的立杆高度", Toast.LENGTH_SHORT).show();
                 return null;//退出
             }
@@ -393,40 +413,22 @@ public class NewSurveyView extends LinearLayout {
         }
 
 
-        List<ImageUploadState> list = mImageSelectAdapter.getImagePaths();
-
-        if (list.size() != 8) {
-            Toast.makeText(getContext(), "环境图片必须8张", Toast.LENGTH_SHORT).show();
+        List<ImageUploadState> list = getImageUploadState(mImageSelectAdapter);
+        if (list == null)
             return null;
-        }
-
-        List<ImageUploadState> list1 = mImageSelectAdapter1.getImagePaths();
-
-        if (list1.size() != 2) {
-            Toast.makeText(getContext(), "全景照必须2张", Toast.LENGTH_SHORT).show();
+        List<ImageUploadState> list1 = getImageUploadState(mImageSelectAdapter1);
+        if (list1 == null)
             return null;
-        }
-
-        List<ImageUploadState> list2 = mImageSelectAdapter2.getImagePaths();
-
-        if (list2.size() != 2) {
-            Toast.makeText(getContext(), "近景照必须2张", Toast.LENGTH_SHORT).show();
+        List<ImageUploadState> list2 = getImageUploadState(mImageSelectAdapter2);
+        if (list2 == null)
             return null;
-        }
-
-        List<ImageUploadState> list3 = mImageSelectAdapter3.getImagePaths();
-
-        if (list3.size() != 1) {
-            Toast.makeText(getContext(), "gps必须1张", Toast.LENGTH_SHORT).show();
+        List<ImageUploadState> list3 = getImageUploadState(mImageSelectAdapter3);
+        if (list3 == null)
             return null;
-        }
-
-        List<ImageUploadState> list4 = mImageSelectAdapter4.getImagePaths();
-
-        if (list4.size() != 1) {
-            Toast.makeText(getContext(), "现场画面照必须1张", Toast.LENGTH_SHORT).show();
+        List<ImageUploadState> list4 = getImageUploadState(mImageSelectAdapter4);
+        if (list4 == null)
             return null;
-        }
+
 
         String remark = mRemarkEdit.getText().toString();
 
@@ -446,12 +448,48 @@ public class NewSurveyView extends LinearLayout {
     }
 
     /**
+     * 得到图片上传信息 并判断状态
+     *
+     * @return
+     */
+    private List<ImageUploadState> getImageUploadState(ImageSelectAdapter imageSelectAdapter) {
+        List<ImageUploadState> list = imageSelectAdapter.getImagePaths();
+        String title = imageSelectAdapter.getImageTitle();//标题
+        int maxNum = imageSelectAdapter.getMaxImageNum();//最大图片数
+        if (list.size() != maxNum) {
+            Toast.makeText(getContext(), title + "必须" + maxNum + "张", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        for (ImageUploadState imageState : list) {
+            File file = new File(imageState.getImagePath());
+            if (!file.exists()) {
+                Toast.makeText(getContext(), "请清除照破损图片", Toast.LENGTH_SHORT).show();
+                mImageSelectAdapter.notifyDataSetChanged();
+                mImageSelectAdapter1.notifyDataSetChanged();
+                mImageSelectAdapter2.notifyDataSetChanged();
+                mImageSelectAdapter3.notifyDataSetChanged();
+                mImageSelectAdapter4.notifyDataSetChanged();//都唤醒一下
+                return null;
+            }
+        }
+        return list;
+    }
+
+    /**
      * 站点获取焦点
      */
     public void pointNameFocus() {
-        mScrollView.fullScroll(ScrollView.FOCUS_UP);//滑到顶部
         mPointNameEdit.requestFocus();//请求焦点
+        mPoleHighEdit.setText("");//文本为空
         mPointNameEdit.setHint("请输入点位名称");
+        mScrollView.smoothScrollTo(0, 0);
+    }
+
+    /**
+     * 滑动到顶部
+     */
+    public void scrollTop() {
+        mScrollView.smoothScrollTo(0, 0);
     }
 
     /**

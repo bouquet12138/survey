@@ -2,7 +2,10 @@ package top.systemsec.survey.view;
 
 import android.content.res.Resources;
 
+import java.util.List;
+
 import top.systemsec.survey.base.IMVPBaseView;
+import top.systemsec.survey.bean.ImageUploadState;
 
 public interface INewSurveyView extends IMVPBaseView {
 

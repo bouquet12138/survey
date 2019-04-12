@@ -1,12 +1,11 @@
 package top.systemsec.survey.fragment;
 
 
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +16,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.zip.InflaterInputStream;
 
 import top.systemsec.survey.R;
-import top.systemsec.survey.activity.PictureViewActivity;
+import top.systemsec.survey.base.ServerInfo;
 import top.systemsec.survey.bean.ImageUploadState;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +36,8 @@ public class LittlePicFragment extends Fragment {
 
     private ImageUploadState mImagePath;//图片路径
     private PhotoView mImgView;
+
+    private String mImageHead;//后台头
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,7 +53,10 @@ public class LittlePicFragment extends Fragment {
      */
     private void initView() {
         mImgView = mView.findViewById(R.id.imgView);
-        Glide.with(getContext()).load(mImagePath.getImagePath()).error(R.drawable.image_error_big).listener(new RequestListener<Drawable>() {
+
+        File file = new File(mImagePath.getImagePath());
+
+        RequestListener<Drawable> listener = new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 return false;
@@ -67,16 +68,29 @@ public class LittlePicFragment extends Fragment {
                 Log.d(TAG, "onResourceReady: ");
                 return false;
             }
-        }).into(mImgView);//设置图片
+        };
 
+        if (file.exists())
+            Glide.with(getContext()).load(mImagePath.getImagePath()).
+                    placeholder(R.drawable.image_loading).error(R.drawable.image_error_big).listener(listener).into(mImgView);//设置图片
+        else {
+
+            String imageUrl = ServerInfo.SERVER_IP + "/Exploit/upload/" + mImageHead + "/" + mImagePath.getImageUrl();
+            Log.d(TAG, "loadFromWeb: imageUrl " + imageUrl);
+            Glide.with(getContext()).load(imageUrl).placeholder(R.drawable.image_loading).error(R.drawable.image_error_big).
+                    placeholder(R.drawable.image_loading).listener(listener).into(mImgView);//设置图片
+
+        }
 
     }
+
 
     public ImageUploadState getImagePath() {
         return mImagePath;
     }
 
-    public void setImagePath(ImageUploadState imagePath) {
+    public void setImagePath(ImageUploadState imagePath, String imageHead) {
         mImagePath = imagePath;
+        mImageHead = imageHead;//图片头
     }
 }

@@ -2,7 +2,6 @@ package top.systemsec.survey.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.zhihu.matisse.Matisse;
 
+import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,23 +21,20 @@ import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBaseActivity;
-import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.TempStorageShowPresenter;
-import top.systemsec.survey.utils.LocalImageSave;
 import top.systemsec.survey.utils.MatisseUtil;
 import top.systemsec.survey.view.ITempStorageShowView;
 import top.systemsec.survey.view.NewSurveyView;
 
-import static top.systemsec.survey.utils.LocalImageSave.IMAGE_DAMAGE;
-import static top.systemsec.survey.utils.LocalImageSave.SAVE_FAIL;
-import static top.systemsec.survey.utils.LocalImageSave.SAVE_OK;
-import static top.systemsec.survey.utils.LocalImageSave.STORAGE_CARD_DISABLED;
 
 public class TempStorageShowActivity extends MVPBaseActivity implements View.OnClickListener, ITempStorageShowView {
 
     private static final String TAG = "TempStorageShowActivity";
+
+    private boolean mCanSelect;//是否可以选择图片
+    private boolean mCanViewPic;//是否可以左右查看图片
 
     private TempStorageShowPresenter mTempStorageShowPresenter;
 
@@ -56,11 +53,13 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
     private List<ImageUploadState> mImagePaths4 = new ArrayList<>();
 
     private Button mSubmitBt, mCancelBt;//确定按钮 取消按钮
+    private SurveyBean mSurveyBean;//勘察Bean
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temp_storage_show);
+
         initView();
         initData();
         initAdapter();
@@ -96,38 +95,18 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
             return;
         }
         Gson gson = new Gson();
-        SurveyBean surveyBean = gson.fromJson(surveyBeanJson, SurveyBean.class);//勘察Bean
+        mSurveyBean = gson.fromJson(surveyBeanJson, SurveyBean.class);//勘察Bean
 
-        if (surveyBean == null) {
+        if (mSurveyBean == null) {
             Toast.makeText(this, "数据读取失败", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        mNewSurveyView.initData(surveyBean);//初始化数据
+        mNewSurveyView.initData(mSurveyBean);//初始化数据
 
-        List<ImageUploadState> imageList = surveyBean.getImgList();//得到存在本地的图片列表
-
-        if (imageList != null)
-            for (ImageUploadState image : imageList) {
-                switch (image.getImageArrId()) {
-                    case 0:
-                        mImagePaths.add(image);//环境照
-                        break;
-                    case 1:
-                        mImagePaths1.add(image);//全景照
-                        break;
-                    case 2:
-                        mImagePaths2.add(image);//近景照
-                        break;
-                    case 3:
-                        mImagePaths3.add(image);//gps照
-                        break;
-                    case 4:
-                        mImagePaths4.add(image);//现场画面照
-                        break;
-                }
-            }
+        List<ImageUploadState> imageList = mSurveyBean.getImgList();//得到存在本地的图片列表
+        sysImageState(imageList);
     }
 
     /**
@@ -153,13 +132,24 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
          * 添加图片监听
          */
         mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
+
+            if (!mCanSelect)
+                return;
+            mCanSelect = false;//不可以选择
+
             mNowAddImgIndex = index;
             mMaxImgNum = maxNum;
             if (mMaxImgNum >= 0)
                 selectImage();//从相册选择图片
         });
 
+        //初始化查看图片的
         mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
+
+            if (!mCanViewPic)//如果不可以查看图片
+                return;
+            mCanViewPic = false;//不可以查看
+
             mNowWatchImgIndex = index;//当前查看的图片索引
 
             Intent intent = new Intent(TempStorageShowActivity.this, PictureViewActivity.class);
@@ -187,6 +177,17 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
             case R.id.backImage:
                 finish();//返回销毁
                 break;
+            case R.id.submitBt://提交按钮
+
+                SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到要提交的surveyBean
+
+                if (surveyBean != null) { //不为空
+                    surveyBean.setNumber(mSurveyBean.getNumber());//编号
+                    surveyBean.setUniqueId(mSurveyBean.getUniqueId());//设置id
+                    mTempStorageShowPresenter.upLoad(surveyBean);//提交数据
+                }
+
+                break;
             case R.id.cancelBt:
                 finish();//返回销毁
                 break;
@@ -205,55 +206,7 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             List<String> sourcePathList = Matisse.obtainPathResult(data);
-
-            List<ImageUploadState> pathList = new ArrayList<>();
-
-            for (String sourcePath : sourcePathList) {
-
-                String pointName = mNewSurveyView.getPointName();//站点名
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
-                String fileName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());
-
-                int state = LocalImageSave.moveImageToAlbum(sourcePath, pointName, fileName);
-
-                switch (state) {
-                    case IMAGE_DAMAGE:
-                        Toast.makeText(this, "图片破损", Toast.LENGTH_SHORT).show();
-                        break;
-                    case STORAGE_CARD_DISABLED:
-                        Toast.makeText(this, "手机内存不足", Toast.LENGTH_SHORT).show();
-                        break;
-                    case SAVE_OK:
-                        pathList.add(new ImageUploadState(mNowAddImgIndex, LocalImageSave.sImagePath));//将路径添加进来
-                        break;
-                    case SAVE_FAIL:
-                        Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-
-            switch (mNowAddImgIndex) {
-                case 0:
-                    mImagePaths.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter();
-                    break;
-                case 1:
-                    mImagePaths1.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter1();
-                    break;
-                case 2:
-                    mImagePaths2.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter2();
-                    break;
-                case 3:
-                    mImagePaths3.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter3();
-                    break;
-                case 4:
-                    mImagePaths4.addAll(pathList);
-                    mNewSurveyView.notifyImgAdapter4();
-                    break;
-            }
+            addImage(sourcePathList);
         }
 
         //查看图片
@@ -290,20 +243,57 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
             }
 
         }
-
-
     }
 
     /**
-     * 启动活动
+     * 添加图片
      *
-     * @param surveyBeanJson json 字符串
-     * @param context        上下文
+     * @param sourcePathList
      */
-    public static void actionStart(String surveyBeanJson, Context context) {
-        Intent intent = new Intent(context, TempStorageShowActivity.class);
-        intent.putExtra("surveyBeanJson", surveyBeanJson);
-        context.startActivity(intent);//开启Activity
+    private void addImage(List<String> sourcePathList) {
+
+        int num = 1;//编号
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
+        String fileName = simpleDateFormat.format(new Date());//文件名
+
+        List<ImageUploadState> pathList = new ArrayList<>();
+
+        for (String imagePath : sourcePathList) {
+
+            File file = new File(imagePath);
+            if (!file.exists())//图片破损
+                continue;
+
+            ImageUploadState imageUploadState = new ImageUploadState(mNowAddImgIndex, imagePath);
+            imageUploadState.setImageName(fileName + "(" + num + ")");//文件名
+            pathList.add(imageUploadState);//添加
+            num++;//数字加加
+        }
+
+        switch (mNowAddImgIndex) {
+            case 0:
+                mImagePaths.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter();
+                break;
+            case 1:
+                mImagePaths1.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter1();
+                break;
+            case 2:
+                mImagePaths2.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter2();
+                break;
+            case 3:
+                mImagePaths3.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter3();
+                break;
+            case 4:
+                mImagePaths4.addAll(pathList);
+                mNewSurveyView.notifyImgAdapter4();
+                break;
+        }
+
+
     }
 
     /**
@@ -327,8 +317,69 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
     }
 
     @Override
+    public void uploadOk() {
+        finish();//销毁活动就可以了
+    }
+
+    @Override
+    public void sysImageState(List<ImageUploadState> imageList) {
+
+        mImagePaths.clear();
+        mImagePaths1.clear();
+        mImagePaths2.clear();
+        mImagePaths3.clear();
+        mImagePaths4.clear();//清除一下图片状态
+
+        if (imageList != null)
+            for (ImageUploadState image : imageList) {
+                switch (image.getImageArrId()) {
+                    case 0:
+                        mImagePaths.add(image);//环境照
+                        break;
+                    case 1:
+                        mImagePaths1.add(image);//全景照
+                        break;
+                    case 2:
+                        mImagePaths2.add(image);//近景照
+                        break;
+                    case 3:
+                        mImagePaths3.add(image);//gps照
+                        break;
+                    case 4:
+                        mImagePaths4.add(image);//现场画面照
+                        break;
+                }
+            }
+
+    }
+
+    /**
+     * 启动活动
+     *
+     * @param surveyBeanJson json 字符串
+     * @param context        上下文
+     */
+    public static void actionStart(String surveyBeanJson, Context context) {
+        Intent intent = new Intent(context, TempStorageShowActivity.class);
+        intent.putExtra("surveyBeanJson", surveyBeanJson);
+        context.startActivity(intent);//开启Activity
+    }
+
+    @Override
     protected void onDestroy() {
         mTempStorageShowPresenter.detachView();//解除绑定
         super.onDestroy();
     }
+
+    /**
+     * 在栈顶
+     */
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume: ");
+        mCanSelect = true;//可以选择图片了
+        mCanViewPic = true;//可以查看图片
+        super.onResume();
+    }
+
 }

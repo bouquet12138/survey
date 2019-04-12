@@ -29,8 +29,8 @@ public abstract class NewSurveyPermissionActivity extends MVPBaseActivity {
             permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);//读取权限
         if (ContextCompat.checkSelfPermission(NewSurveyPermissionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);//写权限
-        if (ContextCompat.checkSelfPermission(NewSurveyPermissionActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-            permissionList.add(Manifest.permission.CAMERA);//相机权限
+       /* if (ContextCompat.checkSelfPermission(NewSurveyPermissionActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            permissionList.add(Manifest.permission.CAMERA);//相机权限*/
 
         if (permissionList.size() != 0) {
             // 如果用户已经拒绝了当前权限,shouldShowRequestPermissionRationale返回true，此时我们需要进行必要的解释和处理

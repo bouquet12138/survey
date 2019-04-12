@@ -19,7 +19,7 @@ import top.systemsec.survey.view.IChangePasswordView;
 
 public class ChangePasswordActivity extends MVPBaseActivity implements View.OnClickListener, IChangePasswordView {
 
-    private String mOldPWStr;//就密码
+    private String mOldPWStr;//旧密码
 
     private EditText mOldPasswordEdit;
     private TextView mOldPasswordHint;
@@ -71,9 +71,9 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String str = s + "";
-                if (!TextUtils.isEmpty(str) && str.equals(mOldPWStr)) {//不是空且不等于旧密码
+                if (!TextUtils.isEmpty(str) && str.equals(mOldPWStr)) //不是空且不等于旧密码
                     mOldPasswordHint.setText("");
-                } else
+                else
                     mOldPasswordHint.setText("密码输入错误！");//清空
                 submitEnable();//提交按钮是否可用
             }
@@ -173,9 +173,10 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
             mSubmitBt.setEnabled(false);//提交按钮不可用
         }
 
-        if (oldStr.equals(mOldPWStr) && newPWStr.length() >= 6 && newPWStr.length() <= 10 && newPWStr.equals(confirmPWStr)) {
+        if (oldStr.equals(mOldPWStr) && newPWStr.length() >= 6 && newPWStr.length() <= 10 && newPWStr.equals(confirmPWStr))
             mSubmitBt.setEnabled(true);//提交按钮可用
-        }
+        else
+            mSubmitBt.setEnabled(false);//不可用
 
     }
 
@@ -232,6 +233,7 @@ public class ChangePasswordActivity extends MVPBaseActivity implements View.OnCl
     @Override
     public void changeOldPW(String newPW) {
         mOldPWStr = newPW;
+        mSubmitBt.setEnabled(false);//提交按钮不管用
     }
 
     /**

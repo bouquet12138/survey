@@ -1,6 +1,8 @@
 package top.systemsec.survey.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,8 +109,7 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
                 SurveyBean surveyBean = mSurveyBeanList.get(position);//得到勘察Bean
                 Gson gson = new Gson();
                 String surveyBeanStr = gson.toJson(surveyBean);//转换成json字符串
-                Log.d(TAG, "setSearchResult: json " + surveyBeanStr);
-                TempStorageShowActivity.actionStart(surveyBeanStr, TempStorageActivity.this);//跳转活动
+                TempStorageShowActivity.actionStart(surveyBeanStr, TempStorageActivity.this);
             });
 
         } else {
@@ -127,5 +129,14 @@ public class TempStorageActivity extends MVPBaseActivity implements View.OnClick
     protected void onDestroy() {
         mTempStoragePresenter.detachView();//解除绑定
         super.onDestroy();
+    }
+
+    /**
+     * 重新回来就刷新一下
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTempStoragePresenter.refresh();//要刷新
     }
 }

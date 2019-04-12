@@ -45,12 +45,10 @@ public class MyEditText extends RelativeLayout {
      * 初始化监听
      */
     private void initListener() {
-        mDeleteImg.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditText.setText("");//清空输入框
-            }
-        });
+        mDeleteImg.setOnClickListener((View v) -> {
+                    mEditText.setText("");//清空输入框
+                }
+        );
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

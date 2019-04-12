@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.List;
 
 import top.systemsec.survey.R;
@@ -64,7 +65,13 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
 
         if (getItemViewType(position) == NORMAL_VIEW) {
             String imagePath = mImagePaths.get(position).getImagePath();
-            Glide.with(mContext).load(imagePath).into(holder.imageView);//设置图片
+
+            File file = new File(imagePath);
+            if (file.exists())
+                Glide.with(mContext).load(imagePath).error(R.drawable.image_error).into(holder.imageView);//设置图片
+            else
+                holder.imageView.setImageResource(R.drawable.image_error);//图片错误
+
             holder.deleteImage.setOnClickListener((v) -> {
                 mImagePaths.remove(position);
                 notifyDataSetChanged();//唤醒数据更新
@@ -170,5 +177,14 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      */
     public List<ImageUploadState> getImagePaths() {
         return mImagePaths;
+    }
+
+
+    public String getImageTitle() {
+        return mImageTitle;
+    }
+
+    public int getMaxImageNum() {
+        return mMaxImageNum;
     }
 }

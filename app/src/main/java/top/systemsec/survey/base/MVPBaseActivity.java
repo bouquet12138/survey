@@ -65,6 +65,11 @@ public class MVPBaseActivity extends BaseActivity implements IMVPBaseView {
     }
 
     @Override
+    public void showLongToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public Context getContext() {
         return MVPBaseActivity.this;
     }

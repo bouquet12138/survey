@@ -17,14 +17,17 @@ import top.systemsec.survey.dialog.ConfirmDialog;
 public class PersonalCenterActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mBackImage;
+
     private TextView mUserName;
     private TextView mPhoneNum;
     private TextView mStreetName;
     private TextView mPoliceName;
+
     private TextView mChangePasswordText;
     private TextView mAppUpdate;
     private TextView mFeedBack;
     private TextView mAbout;
+
     private Button mQuitBt;
 
     private ConfirmDialog mConfirmDialog;//确定对话框
@@ -63,7 +66,8 @@ public class PersonalCenterActivity extends BaseActivity implements View.OnClick
         if (userBean != null) {
             mUserName.setText(userBean.getName());//姓名
             mPhoneNum.setText(userBean.getPhone());//手机号
-
+            mStreetName.setText(userBean.getStreet());//街道
+            mPoliceName.setText(userBean.getStation());//街道
         }
 
     }

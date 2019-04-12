@@ -9,6 +9,7 @@ import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBasePresenter;
+import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.base.OnGetInfoListener;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.StreetAndPolice;
@@ -30,6 +31,12 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
 
     private final int ALL_SUCCESS = 5;//所有信息上传成功
     private final int ALL_NET_ERROR = 6;//所有信息上传时网络错误
+
+    private final int TEMP_SUCCESS = 7;//暂存成功
+    private final int TEMP_NET_ERROR = 8;//暂存失败
+
+    private final int IMAGE_LOCAL_SUCCESS = 9;//图片本地缓存成功
+    private final int IMAGE_LOCAL_ERROR = 10;//图片本地缓存失败
 
     private SurveyBean mSurveyBean;
     private List<ImageUploadState> mImageUploadStates;//图片上传列表
@@ -65,6 +72,7 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
                     break;
                 case IMAGE_SUCCESS:
                     String imageUrl = (String) msg.obj;
+
                     mImageUploadStates.get(mNowUploadIndex).setImageUrl(imageUrl);//设置图片Url
                     mNowUploadIndex++;
                     if (mNowUploadIndex >= mImageUploadStates.size()) {
@@ -76,10 +84,8 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
                     break;
                 case IMAGE_NET_ERROR:
                     getView().showToast("网络错误,数据已缓存到本地");
-                    mSurveyBean.setImgList(mImageUploadStates);// 设置图片列表
+                    mSurveyBean.setImgList(mImageUploadStates);//设置图片列表
                     saveSurvey(mSurveyBean);//存储一下
-                    getView().hideLoading();//隐藏进度条
-                    getView().reStart();//重启
                     break;
                 case ALL_SUCCESS:
                     getView().showToast("数据上传成功");
@@ -92,7 +98,26 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
                     getView().showToast("网络错误数据上传失败，已缓存到本地");
                     saveSurvey(mSurveyBean);//存储一下
                     break;
+                case TEMP_SUCCESS:
+                    String number = (String) msg.obj;//得到编号
 
+                    mSurveyBean.setNumber(number);//设置编号
+                    saveSurvey(mSurveyBean);//存储一下
+                    break;
+                case TEMP_NET_ERROR:
+                    getView().showToast("网络错误数据暂存到本地");
+                    saveSurvey(mSurveyBean);//存储一下
+                    break;
+                case IMAGE_LOCAL_SUCCESS:
+                    getView().showLongToast("数据缓存成功");
+                    getView().hideLoading();//隐藏对话框
+                    getView().reStart();//重新刷新当前页面
+                    break;
+                case IMAGE_LOCAL_ERROR:
+                    getView().showToast("内存控件不足，保存失败");
+                    getView().hideLoading();//隐藏对话框
+                    getView().reStart();//重新刷新当前页面
+                    break;
             }
         }
     };
@@ -103,16 +128,24 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
      * @param surveyBean
      */
     public void tempSave(SurveyBean surveyBean) {
+        if (!isViewAttached())
+            return;
 
-        mNewSurveyModel.uploadDataNoImage(surveyBean, false, new OnGetInfoListener<String>() {
+        mSurveyBean = surveyBean;//存储一下
+        getView().showLoading("数据暂存中..");
+
+        mNewSurveyModel.uploadSurveyInfo(surveyBean, false, new OnGetInfoListener<String>() {
             @Override
             public void onSuccess(String info) {
-
+                Message message = mHandler.obtainMessage();//获取信息
+                message.what = TEMP_SUCCESS;//暂存成功
+                message.obj = info;//把信息传过去
+                mHandler.sendMessage(message);//发送信息
             }
 
             @Override
             public void onFail() {
-
+                mHandler.sendEmptyMessage(TEMP_NET_ERROR);//空信息
             }
 
             @Override
@@ -125,11 +158,11 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
     /**
      * 上传所有信息
      */
-    public void upLoadAllInfo(SurveyBean surveyBean) {
+    private void upLoadAllInfo(SurveyBean surveyBean) {
         if (!isViewAttached())
             return;
         getView().setLoadingHint("全部数据上传中..");
-        mNewSurveyModel.uploadDataNoImage(surveyBean, true, new OnGetInfoListener<String>() {
+        mNewSurveyModel.uploadSurveyInfo(surveyBean, true, new OnGetInfoListener<String>() {
             @Override
             public void onSuccess(String info) {
                 Message message = mHandler.obtainMessage();//获取信息
@@ -160,28 +193,26 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
             return;
         if (surveyBean != null) {
 
-            mSurveyBean.setSaveTime();//保存一下
-            getView().setLoadingHint("将图片存储到本地");
-            List<ImageUploadState> imageUploadStates = surveyBean.getImgList();//得到imgList
-            String pointName = surveyBean.getPointName();//站点名称
-
-            for (int i = 0; i < imageUploadStates.size(); i++) {
-                ImageUploadState imageState = imageUploadStates.get(i);//得到第i个
-                //Log.d(TAG, "saveSurvey: 图片名称" + imageState.getImageName());
-                int state = LocalImageSave.moveImageToAlbum(imageState.getImagePath(), pointName, imageState.getImageName());//本地存储一下
-
-                switch (state) {
-                    case LocalImageSave.STORAGE_CARD_DISABLED:
-                        getView().showToast("储存卡内存不足，请清理内存");
-                        break;
-                }
-            }
+            surveyBean.setSaveTime();//设置保存时间
             mNewSurveyModel.saveSurveyToLocal(surveyBean);//保存一下
+            getView().setLoadingHint("图片存储到本地..");
 
-            getView().showToast("数据保存成功");//数据保存成功
+            new Thread(() -> {
+                List<ImageUploadState> imageUploadStates = surveyBean.getImgList();//得到imgList
+                String pointName = surveyBean.getPointName();//站点名称
+                String fileHeadName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_";
 
-            getView().hideLoading();//隐藏对话框
-            getView().reStart();//重新刷新当前页面
+                for (int i = 0; i < imageUploadStates.size(); i++) {
+                    ImageUploadState imageState = imageUploadStates.get(i);//得到第i个
+                    int state = LocalImageSave.moveImageToAlbum(imageState.getImagePath(), pointName, fileHeadName + imageState.getImageName());//本地存储一下
+                    if (state == LocalImageSave.STORAGE_CARD_DISABLED) {
+                        mHandler.sendEmptyMessage(IMAGE_LOCAL_ERROR);//图片本地存储失败
+                        return;
+                    }
+                }
+                mHandler.sendEmptyMessage(IMAGE_LOCAL_SUCCESS);//图片本地保存成功
+            }).start();
+
         }
     }
 
@@ -195,14 +226,6 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
             return;
         mSurveyBean = surveyBean;//提取到外面
         mImageUploadStates = surveyBean.getImgList();
-
-        for (int i = 0; i < mImageUploadStates.size(); i++) {
-
-            ImageUploadState imageState = mImageUploadStates.get(i);
-            File file = new File(imageState.getImagePath());
-            if (!file.exists())
-                getView().showToast("请清除第" + (i + 1) + "张破损图片");
-        }
 
         mNowUploadIndex = 0;//当前上传索引
         getView().showLoading("图片上传中");
