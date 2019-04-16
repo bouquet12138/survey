@@ -6,7 +6,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +31,8 @@ import top.systemsec.survey.custom_view.SpinnerView;
 
 public class NewSurveyView extends LinearLayout {
 
+    private static final String TAG = "NewSurveyView";
+
     private ImageView mBackImage;//返回按钮
 
     /**
@@ -43,8 +47,8 @@ public class NewSurveyView extends LinearLayout {
     private EditText mDetailAddressEdit;
     private EditText mLongitude;
     private EditText mLatitudeEdit;
-    private SpinnerView mStreetSpinner;
-    private SpinnerView mPoliceSpinner;
+    private EditText mStreetEdit;
+    private EditText mPoliceEdit;
 
     /**
      * 摄像头信息
@@ -81,6 +85,8 @@ public class NewSurveyView extends LinearLayout {
     private ImageSelectAdapter mImageSelectAdapter3;
     private ImageSelectAdapter mImageSelectAdapter4;
 
+    private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
+
     public NewSurveyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
@@ -102,8 +108,8 @@ public class NewSurveyView extends LinearLayout {
         mDetailAddressEdit = findViewById(R.id.detailAddressEdit);
         mLongitude = findViewById(R.id.longitude);
         mLatitudeEdit = findViewById(R.id.latitudeEdit);
-        mStreetSpinner = findViewById(R.id.streetSpinner);
-        mPoliceSpinner = findViewById(R.id.policeSpinner);
+        mStreetEdit = findViewById(R.id.streetEdit);
+        mPoliceEdit = findViewById(R.id.policeEdit);
 
         mPoleRadio = findViewById(R.id.poleRadio);//立杆安装
         mWallRadio = findViewById(R.id.wallRadio);//壁挂安装
@@ -126,6 +132,39 @@ public class NewSurveyView extends LinearLayout {
         mRemarkEdit = findViewById(R.id.remarkEdit);
     }
 
+    /**
+     * 初始化布局
+     */
+    public void initLayout() {
+
+        mLayoutListener = () -> {
+            Log.d(TAG, "initLayout: ");
+            if (mOnGetWidthListener != null)
+                mOnGetWidthListener.onGetWidth(mEnvImgRecyclerView.getWidth());//得到宽度
+            mEnvImgRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(mLayoutListener);//移除监听
+        };
+
+        mEnvImgRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(mLayoutListener);//设置监听
+    }
+
+    /**
+     * 得到宽度的监听
+     */
+    public interface OnGetWidthListener {
+        void onGetWidth(int width);
+    }
+
+    private OnGetWidthListener mOnGetWidthListener;
+
+    /**
+     * 设置得到宽度的监听
+     *
+     * @param onGetWidthListener
+     */
+    public void setOnGetWidthListener(OnGetWidthListener onGetWidthListener) {
+        mOnGetWidthListener = onGetWidthListener;
+    }
+
     public void initData(SurveyBean surveyBean) {
         mPointNameEdit.setText(surveyBean.getPointName());//站点名称
         if (!TextUtils.isEmpty(surveyBean.getPointName()))
@@ -133,8 +172,8 @@ public class NewSurveyView extends LinearLayout {
         mDetailAddressEdit.setText(surveyBean.getDetailAddress());//详细地址
         mLongitude.setText(surveyBean.getLongitude());//经度
         mLatitudeEdit.setText(surveyBean.getLatitude());//纬度
-        mStreetSpinner.setNowStr(surveyBean.getStreet());//街道
-        mPoliceSpinner.setNowStr(surveyBean.getPolice());//警局
+        mStreetEdit.setText(surveyBean.getStreet());//街道
+        mPoliceEdit.setText(surveyBean.getPolice());//警局
 
         //摄像头信息
         int installType = surveyBean.getCameraInstallType();
@@ -196,24 +235,24 @@ public class NewSurveyView extends LinearLayout {
      *
      * @param streets 街道集合
      */
-    public void initStreets(String[] streets) {
+  /*  public void initStreets(String[] streets) {
         mStreetSpinner.setData(streets);
-    }
+    }*/
 
     /**
      * 初始化派出所
      *
      * @param polices 派出所集合
      */
-    public void initPolices(String[] polices) {
+   /* public void initPolices(String[] polices) {
         mPoliceSpinner.setData(polices);
-    }
+    }*/
 
     /**
      * 初始化图片适配器
      */
-    public void initImageAdapter(List<ImageUploadState> imagePaths) {
-        mImageSelectAdapter = new ImageSelectAdapter(imagePaths, getContext(), "环境照", 0, 8);
+    public void initImageAdapter(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter = new ImageSelectAdapter(imagePaths, getContext(), "环境照", 0, 8, width);
         mEnvImgRecyclerView.setAdapter(mImageSelectAdapter);
         mEnvImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
     }
@@ -221,8 +260,8 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化全景照图片适配器
      */
-    public void initImageAdapter1(List<ImageUploadState> imagePaths) {
-        mImageSelectAdapter1 = new ImageSelectAdapter(imagePaths, getContext(), "全景照", 1, 2);
+    public void initImageAdapter1(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter1 = new ImageSelectAdapter(imagePaths, getContext(), "全景照", 1, 2, width);
         mOverallViewRecyclerView.setAdapter(mImageSelectAdapter1);
         mOverallViewRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
@@ -230,8 +269,8 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化近照图片适配器
      */
-    public void initImageAdapter2(List<ImageUploadState> imagePaths) {
-        mImageSelectAdapter2 = new ImageSelectAdapter(imagePaths, getContext(), "近景照", 2, 2);
+    public void initImageAdapter2(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter2 = new ImageSelectAdapter(imagePaths, getContext(), "近景照", 2, 2, width);
         mCloseShotRecyclerView.setAdapter(mImageSelectAdapter2);
         mCloseShotRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
@@ -239,8 +278,8 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化gps图片适配器
      */
-    public void initImageAdapter3(List<ImageUploadState> imagePaths) {
-        mImageSelectAdapter3 = new ImageSelectAdapter(imagePaths, getContext(), "gps照", 3, 1);
+    public void initImageAdapter3(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter3 = new ImageSelectAdapter(imagePaths, getContext(), "gps照", 3, 1, width);
         mGpsImgRecyclerView.setAdapter(mImageSelectAdapter3);
         mGpsImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
     }
@@ -248,8 +287,8 @@ public class NewSurveyView extends LinearLayout {
     /**
      * 初始化现场照图片适配器
      */
-    public void initImageAdapter4(List<ImageUploadState> imagePaths) {
-        mImageSelectAdapter4 = new ImageSelectAdapter(imagePaths, getContext(), "现场画面照", 4, 1);
+    public void initImageAdapter4(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter4 = new ImageSelectAdapter(imagePaths, getContext(), "现场画面照", 4, 1, width);
         mSceneImgRecyclerView.setAdapter(mImageSelectAdapter4);
         mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
     }

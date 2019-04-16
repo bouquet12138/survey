@@ -93,7 +93,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="现场画面照1张" />
+            android:text="现场勘查资料拍照1张" />
     </LinearLayout>
     <!--RecyclerView-->
     <LinearLayout
@@ -120,5 +120,20 @@
 
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:text="其他相册" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/otherImgRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false">
+
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

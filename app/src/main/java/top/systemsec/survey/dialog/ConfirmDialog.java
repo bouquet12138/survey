@@ -11,6 +11,9 @@ import top.systemsec.survey.R;
 
 public class ConfirmDialog extends Dialog {
 
+    private String mTitleStr = "您确定要退出当前账户吗?";
+    private String mConfirmStr = "确定";
+    private int mColor = 0xff5b8cff;//蓝色
 
     private TextView mTitleText;//标题文本
     private TextView mDeleteBt;
@@ -36,9 +39,9 @@ public class ConfirmDialog extends Dialog {
         mDeleteBt = findViewById(R.id.deleteBt);
         mCancelBt = findViewById(R.id.cancelBt);
 
-        mTitleText.setText("您确定退出当前账号吗？");
-        mDeleteBt.setText("确定");
-        mDeleteBt.setTextColor(0xff5b8cff);//蓝色
+        mTitleText.setText(mTitleStr);
+        mDeleteBt.setText(mConfirmStr);
+        mDeleteBt.setTextColor(mColor);//设置文本蓝色
     }
 
     private void initListener() {
@@ -63,4 +66,18 @@ public class ConfirmDialog extends Dialog {
     public void setOnConfirmClickListener(OnConfirmClickListener onConfirmClickListener) {
         mOnConfirmClickListener = onConfirmClickListener;
     }
+
+    /**
+     * 设置数据
+     *
+     * @param titleStr
+     * @param confirmStr
+     * @param confirmColor
+     */
+    public void setData(String titleStr, String confirmStr, int confirmColor) {
+        mTitleStr = titleStr;
+        mConfirmStr = confirmStr;
+        mColor = confirmColor;//确定文本的颜色
+    }
+
 }

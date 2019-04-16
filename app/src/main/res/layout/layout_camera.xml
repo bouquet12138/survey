@@ -92,7 +92,8 @@
 
         <EditText
             android:id="@+id/dirEdit1"
-            style="@style/style_camera_info_edit" />
+            style="@style/style_camera_info_edit"
+            android:inputType="number" />
 
 
         <TextView
@@ -103,7 +104,8 @@
         <EditText
             android:id="@+id/dirEdit2"
             style="@style/style_camera_info_edit"
-            android:layout_marginRight="20dp" />
+            android:layout_marginRight="20dp"
+            android:inputType="number" />
 
     </LinearLayout>
 
@@ -164,7 +166,7 @@
 
         <TextView
             style="@style/style_camera_info_text"
-            android:text="环球监控头" />
+            android:text="高清球机" />
 
         <EditText
             android:id="@+id/globalNumEdit"

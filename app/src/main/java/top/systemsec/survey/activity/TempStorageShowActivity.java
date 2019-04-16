@@ -24,6 +24,7 @@ import top.systemsec.survey.base.MVPBaseActivity;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.presenter.TempStorageShowPresenter;
+import top.systemsec.survey.utils.DensityUtil;
 import top.systemsec.survey.utils.MatisseUtil;
 import top.systemsec.survey.view.ITempStorageShowView;
 import top.systemsec.survey.view.NewSurveyView;
@@ -62,7 +63,6 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
 
         initView();
         initData();
-        initAdapter();
         initListener();
 
         mTempStorageShowPresenter = new TempStorageShowPresenter();
@@ -112,12 +112,12 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
     /**
      * 初始化适配器
      */
-    private void initAdapter() {
-        mNewSurveyView.initImageAdapter(mImagePaths);
-        mNewSurveyView.initImageAdapter1(mImagePaths1);
-        mNewSurveyView.initImageAdapter2(mImagePaths2);
-        mNewSurveyView.initImageAdapter3(mImagePaths3);
-        mNewSurveyView.initImageAdapter4(mImagePaths4);
+    private void initAdapter(int width) {
+        mNewSurveyView.initImageAdapter(mImagePaths, width);
+        mNewSurveyView.initImageAdapter1(mImagePaths1, width);
+        mNewSurveyView.initImageAdapter2(mImagePaths2, width);
+        mNewSurveyView.initImageAdapter3(mImagePaths3, width);
+        mNewSurveyView.initImageAdapter4(mImagePaths4, width);
     }
 
     /**
@@ -128,40 +128,47 @@ public class TempStorageShowActivity extends MVPBaseActivity implements View.OnC
         mSubmitBt.setOnClickListener(this::onClick);
         mCancelBt.setOnClickListener(this::onClick);
 
-        /**
-         * 添加图片监听
-         */
-        mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
+        mNewSurveyView.initLayout();//初始化布局
 
-            if (!mCanSelect)
-                return;
-            mCanSelect = false;//不可以选择
+        mNewSurveyView.setOnGetWidthListener((w) -> {
 
-            mNowAddImgIndex = index;
-            mMaxImgNum = maxNum;
-            if (mMaxImgNum >= 0)
-                selectImage();//从相册选择图片
+            initAdapter(w);
+
+            //添加图片监听
+            mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
+
+                if (!mCanSelect)
+                    return;
+                mCanSelect = false;//不可以选择
+
+                mNowAddImgIndex = index;
+                mMaxImgNum = maxNum;
+                if (mMaxImgNum >= 0)
+                    selectImage();//从相册选择图片
+            });
+
+            //初始化查看图片的
+            mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
+
+                if (!mCanViewPic)//如果不可以查看图片
+                    return;
+                mCanViewPic = false;//不可以查看
+
+                mNowWatchImgIndex = index;//当前查看的图片索引
+
+                Intent intent = new Intent(TempStorageShowActivity.this, PictureViewActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("imageName", imageName);
+                bundle.putSerializable("imageList", (Serializable) imageList);
+                bundle.putInt("imgIndex", imgIndex);
+                intent.putExtras(bundle);
+
+                startActivityForResult(intent, VIEW_PIC);//启动活动
+            });
+
         });
 
-        //初始化查看图片的
-        mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
-
-            if (!mCanViewPic)//如果不可以查看图片
-                return;
-            mCanViewPic = false;//不可以查看
-
-            mNowWatchImgIndex = index;//当前查看的图片索引
-
-            Intent intent = new Intent(TempStorageShowActivity.this, PictureViewActivity.class);
-
-            Bundle bundle = new Bundle();
-            bundle.putString("imageName", imageName);
-            bundle.putSerializable("imageList", (Serializable) imageList);
-            bundle.putInt("imgIndex", imgIndex);
-            intent.putExtras(bundle);
-
-            startActivityForResult(intent, VIEW_PIC);//启动活动
-        });
     }
 
     /**

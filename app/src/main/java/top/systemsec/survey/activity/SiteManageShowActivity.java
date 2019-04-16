@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -64,6 +65,8 @@ public class SiteManageShowActivity extends BaseActivity {
     private ImageFixAdapter mImageFixAdapter3;
     private ImageFixAdapter mImageFixAdapter4;
     private String mImgHead;
+    private ImageList mImageList;
+    private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,6 @@ public class SiteManageShowActivity extends BaseActivity {
         setContentView(R.layout.activity_site_manage_show);
         initView();
         initData();
-        initListener();
     }
 
     /**
@@ -177,7 +179,7 @@ public class SiteManageShowActivity extends BaseActivity {
         //摄像头信息
         int installType = surveyBean.getCameraInstallType();
 
-        if (installType == 2)//TODO:如果是壁挂安装
+        if (installType == 2)
             mWallRadio.setChecked(true);//选中壁挂安装
 
         mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
@@ -192,27 +194,15 @@ public class SiteManageShowActivity extends BaseActivity {
 
         mRemarkEdit.setText(surveyBean.getRemark());//备注
 
-        ImageList imageList = new ImageList(surveyBean.getImgList());//图片列表
+        //图片列表
+        mImageList = new ImageList(surveyBean.getImgList());
 
-        mImageFixAdapter = new ImageFixAdapter(imageList.getImagePaths(), mImgHead, this, "环境照");
-        mEnvImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        mEnvImgRecyclerView.setAdapter(mImageFixAdapter);//设置适配器
+        mLayoutListener = () -> {
+            initAdapter(mEnvImgRecyclerView.getWidth());//初始化适配器
+            mEnvImgRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(mLayoutListener);//移除布局监听
+        };
 
-        mImageFixAdapter1 = new ImageFixAdapter(imageList.getImagePaths1(), mImgHead, this, "全景照");
-        mOverallViewRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mOverallViewRecyclerView.setAdapter(mImageFixAdapter1);//设置适配器
-
-        mImageFixAdapter2 = new ImageFixAdapter(imageList.getImagePaths2(), mImgHead, this, "近景照");
-        mCloseShotRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mCloseShotRecyclerView.setAdapter(mImageFixAdapter2);//设置适配器
-
-        mImageFixAdapter3 = new ImageFixAdapter(imageList.getImagePaths3(), mImgHead, this, "gps照");
-        mGpsImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        mGpsImgRecyclerView.setAdapter(mImageFixAdapter3);//设置适配器
-
-        mImageFixAdapter4 = new ImageFixAdapter(imageList.getImagePaths4(), mImgHead, this, "现场画面照");
-        mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        mSceneImgRecyclerView.setAdapter(mImageFixAdapter4);//设置适配器
+        mEnvImgRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(mLayoutListener);//设置布局监听
 
     }
 
@@ -245,6 +235,34 @@ public class SiteManageShowActivity extends BaseActivity {
         mImageFixAdapter3.setOnImageClickListener(onImageClickListener);//设置监听
         mImageFixAdapter4.setOnImageClickListener(onImageClickListener);//设置监听
 
+    }
+
+    /**
+     * 初始化适配器
+     */
+    private void initAdapter(int width) {
+
+        mImageFixAdapter = new ImageFixAdapter(mImageList.getImagePaths(), mImgHead, this, "环境照", width);
+        mEnvImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        mEnvImgRecyclerView.setAdapter(mImageFixAdapter);//设置适配器
+
+        mImageFixAdapter1 = new ImageFixAdapter(mImageList.getImagePaths1(), mImgHead, this, "全景照", width);
+        mOverallViewRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mOverallViewRecyclerView.setAdapter(mImageFixAdapter1);//设置适配器
+
+        mImageFixAdapter2 = new ImageFixAdapter(mImageList.getImagePaths2(), mImgHead, this, "近景照", width);
+        mCloseShotRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mCloseShotRecyclerView.setAdapter(mImageFixAdapter2);//设置适配器
+
+        mImageFixAdapter3 = new ImageFixAdapter(mImageList.getImagePaths3(), mImgHead, this, "gps照", width);
+        mGpsImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        mGpsImgRecyclerView.setAdapter(mImageFixAdapter3);//设置适配器
+
+        mImageFixAdapter4 = new ImageFixAdapter(mImageList.getImagePaths4(), mImgHead, this, "现场画面照", width);
+        mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        mSceneImgRecyclerView.setAdapter(mImageFixAdapter4);//设置适配器
+
+        initListener();//初始化监听
     }
 
     /**

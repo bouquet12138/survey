@@ -111,11 +111,9 @@
             style="@style/style_point_info_text"
             android:text="所属街道" />
 
-        <top.systemsec.survey.custom_view.SpinnerView
-            android:id="@+id/streetSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <EditText
+            android:id="@+id/streetEdit"
+            style="@style/style_point_info_edit" />
 
     </LinearLayout>
 
@@ -126,12 +124,9 @@
             style="@style/style_point_info_text"
             android:text="派出所" />
 
-        <top.systemsec.survey.custom_view.SpinnerView
-            android:id="@+id/policeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-             />
+        <EditText
+            android:id="@+id/policeEdit"
+            style="@style/style_point_info_edit" />
 
     </LinearLayout>
 

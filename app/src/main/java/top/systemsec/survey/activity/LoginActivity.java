@@ -31,7 +31,6 @@ public class LoginActivity extends MVPBaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        initData();//TODO: 这里一定要记得删
         initView();
         initListener();
         mLoginPresenter = new LoginPresenter();
@@ -39,23 +38,6 @@ public class LoginActivity extends MVPBaseActivity implements View.OnClickListen
         mLoginPresenter.readInfo();//读取存储在本地的信息
     }
 
-    private void initData() {
-        int data = 0;
-        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        data = sharedPreferences.getInt("data", 0);
-
-        data++;
-
-        if (data > 40) {
-            Toast.makeText(this, "试用次数已达上限", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("data", data);
-            editor.apply();//应用一下
-        }
-
-    }
 
     private void initView() {
         mPhoneNumEdit = findViewById(R.id.phoneNumEdit);

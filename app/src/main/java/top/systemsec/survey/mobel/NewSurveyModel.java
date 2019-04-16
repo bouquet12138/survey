@@ -163,12 +163,12 @@ public class NewSurveyModel {
     /**
      * 保存勘察
      */
-    public void saveSurveyToLocal(SurveyBean surveyBean) {//TODO:这里要好好检查
+    public void saveSurveyToLocal(SurveyBean surveyBean) {
         if (surveyBean != null) {
             Random random = new Random();
             long uniqueId = random.nextInt(Integer.MAX_VALUE) + 1;
             List<SurveyBean> surveyBeanList = LitePal.where("uniqueId = ?", uniqueId + "").find(SurveyBean.class);
-            while (surveyBeanList != null && surveyBeanList.size() > 0) {
+            while (surveyBeanList != null && surveyBeanList.size() > 0) {//如果唯一id不是空的
                 uniqueId = random.nextInt(Integer.MAX_VALUE) + 1;
                 surveyBeanList = LitePal.where("uniqueId = ?", uniqueId + "").find(SurveyBean.class);
             }
@@ -180,7 +180,7 @@ public class NewSurveyModel {
     /**
      * 唯一id法保存勘察
      */
-    public void saveSurveyUnique(SurveyBean surveyBean) {//TODO:可能有bug 还要检查
+    public void saveSurveyUnique(SurveyBean surveyBean) {
         if (surveyBean != null) {
             long uniqueId = surveyBean.getUniqueId();
 

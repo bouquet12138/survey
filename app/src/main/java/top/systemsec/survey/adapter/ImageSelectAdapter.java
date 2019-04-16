@@ -1,6 +1,7 @@
 package top.systemsec.survey.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,8 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
     private String mImageTitle;//这一组图片的名称
     private int mMaxImageNum;//最大图片数
 
+    private int mWidth;//view宽
+
     /**
      * 构造器
      *
@@ -36,12 +39,13 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
      * @param index
      * @param maxImageNum
      */
-    public ImageSelectAdapter(List<ImageUploadState> imagePaths, Context context, String imageTitle, int index, int maxImageNum) {
+    public ImageSelectAdapter(List<ImageUploadState> imagePaths, Context context, String imageTitle, int index, int maxImageNum, int width) {
         mImagePaths = imagePaths;
         mContext = context;
         mImageTitle = imageTitle;
         mIndex = index;
         mMaxImageNum = maxImageNum;
+        mWidth = width;//宽度
     }
 
     /**
@@ -53,9 +57,21 @@ public class ImageSelectAdapter extends RecyclerView.Adapter<ImageSelectAdapter.
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == NORMAL_VIEW) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
+
+            GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) itemView.getLayoutParams();//布局管理
+            layoutParams.width = mWidth / 4;
+            layoutParams.height = mWidth / 4;
+            itemView.setLayoutParams(layoutParams);
+
             return new MyViewHolder(itemView, viewType);
         } else {
             View footView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_add_image, parent, false);
+
+            GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) footView.getLayoutParams();//布局管理
+            layoutParams.width = mWidth / 4;
+            layoutParams.height = mWidth / 4;
+            footView.setLayoutParams(layoutParams);
+
             return new MyViewHolder(footView, viewType);
         }
     }

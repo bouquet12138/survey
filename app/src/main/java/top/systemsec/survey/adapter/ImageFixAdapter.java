@@ -3,6 +3,7 @@ package top.systemsec.survey.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class ImageFixAdapter extends RecyclerView.Adapter<ImageFixAdapter.MyView
     private Context mContext;
 
     private String mImageTitle;//这一组图片的名称
+    private int mWidth;
 
     /**
      * 构造器
@@ -41,11 +43,12 @@ public class ImageFixAdapter extends RecyclerView.Adapter<ImageFixAdapter.MyView
      * @param imagePaths
      * @param context
      */
-    public ImageFixAdapter(List<ImageUploadState> imagePaths, String imageHead, Context context, String imageTitle) {
+    public ImageFixAdapter(List<ImageUploadState> imagePaths, String imageHead, Context context, String imageTitle, int width) {
         mImagePaths = imagePaths;
         mImageHead = imageHead;//记录图片头
         mContext = context;
         mImageTitle = imageTitle;
+        mWidth = width;//记录一下宽度
     }
 
     /**
@@ -57,6 +60,12 @@ public class ImageFixAdapter extends RecyclerView.Adapter<ImageFixAdapter.MyView
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
+
+        GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams) itemView.getLayoutParams();//布局管理
+        layoutParams.width = mWidth / 4;
+        layoutParams.height = mWidth / 4;
+        itemView.setLayoutParams(layoutParams);
+
         return new MyViewHolder(itemView);
     }
 
