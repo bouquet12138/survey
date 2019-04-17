@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.SurveyBean;
 
 public class SiteManageModel {
@@ -31,7 +32,7 @@ public class SiteManageModel {
     public List<SurveyBean> searchLocalSurveyBean(String keyWord) {
 
         if (mSurveyBeans.size() == 0) {//长度为空
-            mSurveyBeans = LitePal.where("isUpLoadOk = ?", "1").find(SurveyBean.class);
+            mSurveyBeans = LitePal.where("isUpLoadOk = ? and useId = ?", "1", NowUserInfo.getUserBean().getId() + "").find(SurveyBean.class);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             Collections.sort(mSurveyBeans, (SurveyBean o1, SurveyBean o2) -> {
                         try {

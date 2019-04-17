@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.SurveyBean;
 
 public class TempStorageModel {
@@ -26,7 +27,7 @@ public class TempStorageModel {
     public List<SurveyBean> searchLocalSurveyBean(String keyWord) {
 
         if (mSurveyBeans.size() == 0) {//长度为空
-            mSurveyBeans = LitePal.where("isUpLoadOk = ?", "0").find(SurveyBean.class);//未上传成功的
+            mSurveyBeans = LitePal.where("isUpLoadOk = ? and useId = ?", "0", NowUserInfo.getUserBean().getId() + "").find(SurveyBean.class);//未上传成功的
             Collections.reverse(mSurveyBeans);//倒叙反转一下
 
             Log.d(TAG, "searchLocalSurveyBean: " + mSurveyBeans);

@@ -2,41 +2,29 @@ package top.systemsec.survey.presenter;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.File;
 import java.util.List;
 
-import top.systemsec.survey.R;
 import top.systemsec.survey.base.MVPBasePresenter;
-import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.base.OnGetInfoListener;
 import top.systemsec.survey.bean.ImageUploadState;
-import top.systemsec.survey.bean.StreetAndPolice;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.mobel.NewSurveyModel;
-import top.systemsec.survey.utils.LocalImageSave;
 import top.systemsec.survey.view.INewSurveyView;
 
 public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
 
-    private static final String TAG = "NewSurveyPresenter";
+    private final int STREET_COMPLETE = 0;//街道响应完成
 
-    private final int STREET_SUCCESS = 0;//成功
-    private final int STREET_NET_ERROR = 1;//网络错误
-    private final int STREET_COMPLETE = 2;//响应完成
+    private final int IMAGE_SUCCESS = 1;//图片上传成功
+    private final int IMAGE_NET_ERROR = 2;//网络错误
 
-    private final int IMAGE_SUCCESS = 3;//图片上传成功
-    private final int IMAGE_NET_ERROR = 4;//网络错误
+    private final int ALL_SUCCESS = 3;//所有信息上传成功
+    private final int ALL_NET_ERROR = 4;//所有信息上传时网络错误
 
-    private final int ALL_SUCCESS = 5;//所有信息上传成功
-    private final int ALL_NET_ERROR = 6;//所有信息上传时网络错误
-
-    private final int TEMP_SUCCESS = 7;//暂存成功
-    private final int TEMP_NET_ERROR = 8;//暂存失败
-
-    private final int IMAGE_LOCAL_SUCCESS = 9;//图片本地缓存成功
-    private final int IMAGE_LOCAL_ERROR = 10;//图片本地缓存失败
+    private final int TEMP_SUCCESS = 5;//暂存成功
+    private final int TEMP_NET_ERROR = 6;//暂存失败
 
     private SurveyBean mSurveyBean;
     private List<ImageUploadState> mImageUploadStates;//图片上传列表
@@ -51,22 +39,7 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
             if (!isViewAttached())
                 return;
             switch (msg.what) {
-                case STREET_SUCCESS:
-                    StreetAndPolice streetAndPolice = (StreetAndPolice) msg.obj;
-                    String[] streets = streetAndPolice.getStreetList();//街道
-                    String[] polices = streetAndPolice.getPoliceList();//警局
 
-                    getView().initStreet(streets);//初始化街道
-                    getView().initPolice(polices);//初始化警局
-                    break;
-                case STREET_NET_ERROR:
-                    getView().showToast("网络错误");
-                    String[] streets1 = getView().getResources().getStringArray(R.array.streets);//从本地读取街道
-                    String[] polices1 = getView().getResources().getStringArray(R.array.polices);//从本地读取警局
-
-                    getView().initStreet(streets1);//初始化街道
-                    getView().initPolice(polices1);//初始化警局
-                    break;
                 case STREET_COMPLETE:
                     getView().hideLoading();//隐藏进度条
                     break;
@@ -100,23 +73,12 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
                     break;
                 case TEMP_SUCCESS:
                     String number = (String) msg.obj;//得到编号
-
                     mSurveyBean.setNumber(number);//设置编号
                     saveSurvey(mSurveyBean);//存储一下
                     break;
                 case TEMP_NET_ERROR:
                     getView().showToast("网络错误数据暂存到本地");
                     saveSurvey(mSurveyBean);//存储一下
-                    break;
-                case IMAGE_LOCAL_SUCCESS:
-                    getView().showLongToast("数据缓存成功");
-                    getView().hideLoading();//隐藏对话框
-                    getView().reStart();//重新刷新当前页面
-                    break;
-                case IMAGE_LOCAL_ERROR:
-                    getView().showToast("内存控件不足，保存失败");
-                    getView().hideLoading();//隐藏对话框
-                    getView().reStart();//重新刷新当前页面
                     break;
             }
         }
@@ -192,27 +154,10 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
         if (!isViewAttached())
             return;
         if (surveyBean != null) {
-
             surveyBean.setSaveTime();//设置保存时间
             mNewSurveyModel.saveSurveyToLocal(surveyBean);//保存一下
-            getView().setLoadingHint("图片存储到本地..");
-
-            new Thread(() -> {
-                List<ImageUploadState> imageUploadStates = surveyBean.getImgList();//得到imgList
-                String pointName = surveyBean.getPointName();//站点名称
-                String fileHeadName = pointName + "_" + NowUserInfo.getUserBean().getName() + "_";
-
-                for (int i = 0; i < imageUploadStates.size(); i++) {
-                    ImageUploadState imageState = imageUploadStates.get(i);//得到第i个
-                    int state = LocalImageSave.moveImageToAlbum(imageState.getImagePath(), pointName, fileHeadName + imageState.getImageName());//本地存储一下
-                    if (state == LocalImageSave.STORAGE_CARD_DISABLED) {
-                        mHandler.sendEmptyMessage(IMAGE_LOCAL_ERROR);//图片本地存储失败
-                        return;
-                    }
-                }
-                mHandler.sendEmptyMessage(IMAGE_LOCAL_SUCCESS);//图片本地保存成功
-            }).start();
-
+            getView().hideLoading();//隐藏进度框
+            getView().reStart();//清除数据重新开始
         }
     }
 
@@ -259,10 +204,9 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
 
     }
 
-    /**
-     * 得到街道警局信息
-     */
-    public void getStreetAndPoliceInfo() {
+
+    //region 得到街道警局信息 不需要获取了
+  /*  public void getStreetAndPoliceInfo() {
         if (!isViewAttached())//没有view绑定
             return;
 
@@ -286,6 +230,6 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
             }
         });
 
-    }
-
+    }*/
+    //endregion
 }

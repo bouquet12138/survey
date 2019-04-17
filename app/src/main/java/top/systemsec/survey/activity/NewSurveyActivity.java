@@ -3,55 +3,29 @@ package top.systemsec.survey.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
-import com.zhihu.matisse.Matisse;
+import com.baidu.location.LocationClientOption;
 
-import java.io.File;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.dialog.ConfirmDialog;
 import top.systemsec.survey.presenter.NewSurveyPresenter;
 import top.systemsec.survey.R;
 import top.systemsec.survey.utils.GPSUtil;
-import top.systemsec.survey.utils.MatisseUtil;
+
 import top.systemsec.survey.view.INewSurveyView;
-import top.systemsec.survey.view.NewSurveyView;
 
 
-public class NewSurveyActivity extends NewSurveyPermissionActivity implements INewSurveyView {
-
-    private boolean mCanSelect;//是否可以选择图片
-    private boolean mCanViewPic;//是否可以左右查看图片
+public class NewSurveyActivity extends SurveyActivity implements INewSurveyView {
 
     private NewSurveyPresenter mNewSurveyPresenter;//主持
-    private static final String TAG = "NewSurveyActivity";
-
-    private final int SELECT_PICTURE = 0;//选择图片
-    private final int VIEW_PICTURE = 1;//查看图片
-    private final int OPEN_GPS = 2;//打开GPS
-
-    private NewSurveyView mNewSurveyView;
-
-    private List<ImageUploadState> mImagePaths = new ArrayList<>();
-    private List<ImageUploadState> mImagePaths1 = new ArrayList<>();
-    private List<ImageUploadState> mImagePaths2 = new ArrayList<>();
-    private List<ImageUploadState> mImagePaths3 = new ArrayList<>();
-    private List<ImageUploadState> mImagePaths4 = new ArrayList<>();
-
-    private int mNowAddImgIndex, mMaxImgNum;//当前图片索引 最大图片数
-    private int mNowWatchImgIndex;//当前查看图片的索引
 
     private LocationClient mLocationClient;
 
@@ -64,16 +38,25 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_survey);
 
-        mLocationClient = new LocationClient(getApplicationContext());
-        mLocationClient.registerLocationListener(new MyLocationListener());
-
         initView();
+        initLocation();
         initListener();
+        initImageList();//初始化图片列表
 
         mNewSurveyPresenter = new NewSurveyPresenter();//支持
         mNewSurveyPresenter.attachView(this);//绑定一下
 
-        mNewSurveyPresenter.getStreetAndPoliceInfo();//获取警局和街道信息
+    }
+
+    /**
+     * 初始化定位
+     */
+    private void initLocation() {
+        LocationClientOption option = new LocationClientOption();
+        option.setIsNeedAddress(true);//需要地址
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.setLocOption(option);//设置选项
+        mLocationClient.registerLocationListener(new MyLocationListener());
     }
 
     /**
@@ -82,7 +65,6 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
     private void initView() {
         mNewSurveyView = findViewById(R.id.newSurveyView);//新勘察
         mNewSurveyView.initView();//初始化view
-
         mTempStorageBt = findViewById(R.id.tempStorageBt);//暂存按钮
         mSubmitBt = findViewById(R.id.submitBt);//提交按钮
 
@@ -90,16 +72,6 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         mConfirmDialog.setData("请打开GPS", "确定", 0xff5b8cff);//对话框
     }
 
-    /**
-     * 初始化适配器
-     */
-    private void initAdapter(int width) {
-        mNewSurveyView.initImageAdapter(mImagePaths, width);
-        mNewSurveyView.initImageAdapter1(mImagePaths1, width);
-        mNewSurveyView.initImageAdapter2(mImagePaths2, width);
-        mNewSurveyView.initImageAdapter3(mImagePaths3, width);
-        mNewSurveyView.initImageAdapter4(mImagePaths4, width);
-    }
 
     /**
      * 初始化监听
@@ -107,16 +79,7 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
     private void initListener() {
 
         //初始化点击监听
-        mNewSurveyView.initClickListener((v) -> {
-            switch (v.getId()) {
-                case R.id.backImage:
-                    finish();//返回销毁
-                    break;
-                case R.id.locText://获取位置
-                    obtainLocAuthor();//获取位置
-                    break;
-            }
-        });
+        mNewSurveyView.initClickListener(this);
 
         mConfirmDialog.setOnConfirmClickListener(() -> {//确定按钮
             mConfirmDialog.dismiss();//消失
@@ -125,69 +88,48 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         });
 
         //提交
-        mSubmitBt.setOnClickListener((v) -> {
-            SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-            if (surveyBean != null)//TODO:不要忘记非空判断啊
-                mNewSurveyPresenter.upLoadImage(surveyBean);
-        });
+        mSubmitBt.setOnClickListener(this);
 
         //暂存
-        mTempStorageBt.setOnClickListener((v) -> {
-            SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
-            if (surveyBean != null)//TODO:不要忘记非空判断啊
-                mNewSurveyPresenter.tempSave(surveyBean);//暂存一下
-        });
-
-        //测量layout
-        mNewSurveyView.initLayout();
-
-        //得到宽度的监听
-        mNewSurveyView.setOnGetWidthListener((w) -> {
-
-            initAdapter(w);
-
-            /**
-             * 添加图片监听
-             */
-            mNewSurveyView.initAddImageListener((int index, int maxNum) -> {
-
-                if (!mCanSelect)
-                    return;
-                mCanSelect = false;//不可以选择
-
-                mNowAddImgIndex = index;
-                mMaxImgNum = maxNum;
-                if (mMaxImgNum >= 0)
-                    selectImageAuthor();//从相册选择图片
-            });
-
-            mNewSurveyView.initWatchImageListener((int index, String imageName, List<ImageUploadState> imageList, int imgIndex) -> {
-
-                if (!mCanViewPic)//如果不可以查看图片
-                    return;
-                mCanViewPic = false;//不可以查看
-
-                mNowWatchImgIndex = index;//当前查看的图片索引
-                Intent intent = new Intent(NewSurveyActivity.this, PictureViewActivity.class);
-
-                Bundle bundle = new Bundle();
-                bundle.putString("imageName", imageName);
-                bundle.putSerializable("imageList", (Serializable) imageList);
-                bundle.putInt("imgIndex", imgIndex);
-                intent.putExtras(bundle);
-
-                startActivityForResult(intent, VIEW_PICTURE);//启动活动
-            });
-        });
-
+        mTempStorageBt.setOnClickListener(this);
     }
 
-    /**
-     * 从相册选择图片
-     */
     @Override
-    public void selectImage() {
-        MatisseUtil.selectImage(NewSurveyActivity.this, mMaxImgNum, getResources(), SELECT_PICTURE);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.backImage:
+                finish();//返回销毁
+                break;
+            case R.id.locText://获取位置
+                obtainLocAuthor();//获取位置
+                break;
+            case R.id.tempStorageBt:
+                SurveyBean surveyBean1 = mNewSurveyView.getSurveyInfo();//得到勘察信息
+                if (surveyBean1 != null)
+                    mNewSurveyPresenter.tempSave(surveyBean1);//暂存一下
+                break;
+            case R.id.submitBt://提交按钮
+                SurveyBean surveyBean = mNewSurveyView.getSurveyInfo();//得到勘察信息
+                if (surveyBean != null)
+                    mNewSurveyPresenter.upLoadImage(surveyBean);
+                break;
+            case R.id.continuousPhotoBt://连续拍照
+                takePhotoAuthor();//打开相机
+                mNewSurveyView.hideBottomDialog();//隐藏底部
+                break;
+            case R.id.ordinaryPhotoBt://普通拍照
+                mMaxImgNum = 1;//最大图片数变为1
+                takePhotoAuthor();//打开相机
+                mNewSurveyView.hideBottomDialog();//隐藏底部
+                break;
+            case R.id.albumBt://相册
+                mNewSurveyView.hideBottomDialog();//隐藏底部
+                selectImageAuthor();//从相册选择图片
+                break;
+            case R.id.cancelBt:
+                mNewSurveyView.hideBottomDialog();//隐藏底部弹窗
+                break;
+        }
     }
 
     /**
@@ -199,80 +141,10 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
             mConfirmDialog.show();
         } else {
             showLoading("定位获取中..");
-
             mLocationClient.restart();
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
-            List<String> sourcePathList = Matisse.obtainPathResult(data);
-            addImage(sourcePathList);
-        }
-
-        //region查看图片
-        if (requestCode == VIEW_PICTURE && resultCode == RESULT_OK) {
-
-            List<ImageUploadState> imageList = (List<ImageUploadState>) data.getSerializableExtra("imageList");//图片列表
-
-            Log.d(TAG, "onActivityResult: imageList " + imageList);
-
-            switch (mNowWatchImgIndex) {
-                case 0:
-                    mImagePaths.clear();
-                    mImagePaths.addAll(imageList);//全添加进去
-                    mNewSurveyView.notifyImgAdapter();//唤醒数据更新
-                    break;
-                case 1:
-                    mImagePaths1.clear();
-                    mImagePaths1.addAll(imageList);//全添加进去
-                    mNewSurveyView.notifyImgAdapter1();//唤醒数据更新
-                    break;
-                case 2:
-                    mImagePaths2.clear();
-                    mImagePaths2.addAll(imageList);//全添加进去
-                    mNewSurveyView.notifyImgAdapter2();//唤醒数据更新
-                    break;
-                case 3:
-                    mImagePaths3.clear();
-                    mImagePaths3.addAll(imageList);//全添加进去
-                    mNewSurveyView.notifyImgAdapter3();//唤醒数据更新
-                    break;
-                case 4:
-                    mImagePaths4.clear();
-                    mImagePaths4.addAll(imageList);//全添加进去
-                    mNewSurveyView.notifyImgAdapter4();//唤醒数据更新
-                    break;
-            }
-
-        }
-        //endregion
-
-        if (requestCode == OPEN_GPS && requestCode == RESULT_OK) {
-            Log.d(TAG, "onActivityResult: 定位开启");
-            requestLocation();//重新请求定位
-        }
-
-    }
-
-    /**
-     * 初始化街道
-     *
-     * @param streets
-     */
-    @Override
-    public void initStreet(String[] streets) {
-        mNewSurveyView.initStreets(streets);//初始化街道
-    }
-
-    @Override
-    public void initPolice(String[] polices) {
-        mNewSurveyView.initPolices(polices);//初始化警局
-    }
 
     /**
      * 站点名称
@@ -293,67 +165,19 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         SurveyBean surveyBean = new SurveyBean();
         mNewSurveyView.initData(surveyBean);//设置一下数据
         mNewSurveyView.clearData();//清除下数据
-        mNewSurveyView.pointNameFocus();//滚动最上面去
+        mNewSurveyView.scrollTop();//滚动最上面去
         mImagePaths.clear();
         mImagePaths1.clear();
         mImagePaths2.clear();
         mImagePaths3.clear();
         mImagePaths4.clear();
+        mImagePaths5.clear();
         mNewSurveyView.notifyImgAdapter();
         mNewSurveyView.notifyImgAdapter1();
         mNewSurveyView.notifyImgAdapter2();
         mNewSurveyView.notifyImgAdapter3();
         mNewSurveyView.notifyImgAdapter4();
-    }
-
-    /**
-     * 添加图片
-     *
-     * @param sourcePathList
-     */
-    private void addImage(List<String> sourcePathList) {
-
-        int num = 1;//编号
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
-        String fileName = simpleDateFormat.format(new Date());//文件名
-
-        List<ImageUploadState> pathList = new ArrayList<>();
-
-        for (String imagePath : sourcePathList) {
-
-            File file = new File(imagePath);
-            if (!file.exists())//图片破损
-                continue;
-
-            ImageUploadState imageUploadState = new ImageUploadState(mNowAddImgIndex, imagePath);
-            imageUploadState.setImageName(fileName + "(" + num + ")");//文件名
-            pathList.add(imageUploadState);//添加
-            num++;//数字加加
-        }
-
-        switch (mNowAddImgIndex) {
-            case 0:
-                mImagePaths.addAll(pathList);
-                mNewSurveyView.notifyImgAdapter();
-                break;
-            case 1:
-                mImagePaths1.addAll(pathList);
-                mNewSurveyView.notifyImgAdapter1();
-                break;
-            case 2:
-                mImagePaths2.addAll(pathList);
-                mNewSurveyView.notifyImgAdapter2();
-                break;
-            case 3:
-                mImagePaths3.addAll(pathList);
-                mNewSurveyView.notifyImgAdapter3();
-                break;
-            case 4:
-                mImagePaths4.addAll(pathList);
-                mNewSurveyView.notifyImgAdapter4();
-                break;
-        }
-
+        mNewSurveyView.notifyImgAdapter5();
     }
 
 
@@ -371,6 +195,23 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
             } else {
                 mNewSurveyView.setLongitude(bdLocation.getLongitude() + "");//经度
                 mNewSurveyView.setLatitude(bdLocation.getLatitude() + "");//纬度
+
+                StringBuilder address = new StringBuilder();//字符串缓冲
+
+                String province = bdLocation.getProvince();//省
+                if (!TextUtils.isEmpty(province))
+                    address.append(province);
+                String city = bdLocation.getCity();//城市
+                if (!TextUtils.isEmpty(city))
+                    address.append(city);
+                String district = bdLocation.getDistrict();//区
+                if (!TextUtils.isEmpty(district))
+                    address.append(district);
+                String street = bdLocation.getStreet();//街道
+                if (!TextUtils.isEmpty(street))
+                    address.append(street);
+
+                mNewSurveyView.setAddress(address.toString());//设置地址
             }
 
         }
@@ -386,14 +227,4 @@ public class NewSurveyActivity extends NewSurveyPermissionActivity implements IN
         super.onDestroy();
     }
 
-    /**
-     * 在栈顶
-     */
-    @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume: ");
-        mCanSelect = true;//可以选择图片了
-        mCanViewPic = true;//可以查看图片
-        super.onResume();
-    }
 }

@@ -50,6 +50,7 @@ public class NewSurveyModel {
         Log.d(TAG, "UploadDataNoImage: address " + address);
 
         Map<String, String> maps = new LinkedHashMap<>();//线性hashMap
+        maps.put("code", bean.getCode());//得到编号
         maps.put("pointName", bean.getPointName());//点名称
         maps.put("detailAddress", bean.getDetailAddress());//详细地址
         maps.put("longitude", bean.getLongitude());//经度
@@ -73,6 +74,7 @@ public class NewSurveyModel {
             maps.put("closeShotList", "[]");//近景照
             maps.put("gpsImgList", "[]");//gps图片
             maps.put("sceneImgList", "[]");//现场画面照
+            maps.put("otherList", "[]");//其他画面照
         } else {//包含图片
             List<ImageUploadState> imageUploadStates = bean.getImgList();//图片列表
             ImageList imageList = new ImageList(imageUploadStates);
@@ -82,6 +84,9 @@ public class NewSurveyModel {
             maps.put("closeShotList", imageList.getImageUrlStr2());//近景照
             maps.put("gpsImgList", imageList.getImageUrlStr3());//gps图片
             maps.put("sceneImgList", imageList.getImageUrlStr4());//现场画面照
+            maps.put("otherList", imageList.getImageUrlStr5());//现场画面照
+
+            Log.d(TAG, "uploadSurveyInfo: " + imageList.getImageUrlStr5());
         }
 
         maps.put("remark", bean.getRemark());//备注

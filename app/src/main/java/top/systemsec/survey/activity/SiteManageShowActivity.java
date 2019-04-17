@@ -57,6 +57,7 @@ public class SiteManageShowActivity extends BaseActivity {
     private RecyclerView mCloseShotRecyclerView;
     private RecyclerView mGpsImgRecyclerView;
     private RecyclerView mSceneImgRecyclerView;
+    private RecyclerView mOtherImgRecyclerView;//其他图片
 
     private TextView mRemarkEdit;
     private ImageFixAdapter mImageFixAdapter;
@@ -64,6 +65,8 @@ public class SiteManageShowActivity extends BaseActivity {
     private ImageFixAdapter mImageFixAdapter2;
     private ImageFixAdapter mImageFixAdapter3;
     private ImageFixAdapter mImageFixAdapter4;
+    private ImageFixAdapter mImageFixAdapter5;
+
     private String mImgHead;
     private ImageList mImageList;
     private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
@@ -110,6 +113,7 @@ public class SiteManageShowActivity extends BaseActivity {
         mCloseShotRecyclerView = findViewById(R.id.closeShotRecyclerView);
         mGpsImgRecyclerView = findViewById(R.id.gpsImgRecyclerView);
         mSceneImgRecyclerView = findViewById(R.id.sceneImgRecyclerView);
+        mOtherImgRecyclerView = findViewById(R.id.otherImgRecyclerView);//其他相册
 
         mRemarkEdit = findViewById(R.id.remarkEdit);//备注
     }
@@ -167,7 +171,7 @@ public class SiteManageShowActivity extends BaseActivity {
 
         Log.d(TAG, "setData: " + mImgHead + "图片头");
 
-        mNumberText.setText(surveyBean.getNumber());//编号
+        mNumberText.setText(surveyBean.getCode());//编号
         mPointNameEdit.setText(surveyBean.getPointName());//站点名称
 
         mDetailAddressEdit.setText(surveyBean.getDetailAddress());//详细地址
@@ -234,6 +238,7 @@ public class SiteManageShowActivity extends BaseActivity {
         mImageFixAdapter2.setOnImageClickListener(onImageClickListener);//设置监听
         mImageFixAdapter3.setOnImageClickListener(onImageClickListener);//设置监听
         mImageFixAdapter4.setOnImageClickListener(onImageClickListener);//设置监听
+        mImageFixAdapter5.setOnImageClickListener(onImageClickListener);//设置监听
 
     }
 
@@ -261,6 +266,10 @@ public class SiteManageShowActivity extends BaseActivity {
         mImageFixAdapter4 = new ImageFixAdapter(mImageList.getImagePaths4(), mImgHead, this, "现场画面照", width);
         mSceneImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         mSceneImgRecyclerView.setAdapter(mImageFixAdapter4);//设置适配器
+
+        mImageFixAdapter5 = new ImageFixAdapter(mImageList.getImagePaths5(), mImgHead, this, "其他照片", width);
+        mOtherImgRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        mOtherImgRecyclerView.setAdapter(mImageFixAdapter5);//设置适配器
 
         initListener();//初始化监听
     }

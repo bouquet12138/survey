@@ -41,51 +41,61 @@ public class LocalImageSave {
     private static final String TAG = "LocalImageSave";
 
     //用来存储图片并返回本地存储的路径 在app文件件夹下存储，
-    public static String saveImage(Bitmap bitmap, String dirName) {
-        if (bitmap != null) {
-            String state = Environment.getExternalStorageState();
+    public static int saveImage(Bitmap bitmap, String albumName, String fileName) {
+        if (bitmap == null)
+            return SAVE_FAIL;
+        String state = Environment.getExternalStorageState();
+        //如果状态不是mounted，无法读写
+        if (!state.equals(Environment.MEDIA_MOUNTED)) {
+            return STORAGE_CARD_DISABLED;//储存卡不可用
+        }
 
-            if (!state.equals(Environment.MEDIA_MOUNTED)) {
-                Toast.makeText(MyApplication.getContext(), "储存卡不可用", Toast.LENGTH_SHORT).show();
-                return null;
-            }
 
-            File dir = MyApplication.getContext().getExternalCacheDir();
-            Log.d(TAG, "saveImage: ");
-            Date date = new Date();
-            Random random = new Random(date.getTime());
-            String fileName = "survey" + random.nextInt(Integer.MAX_VALUE) + ".jpg";
-            File headDir = new File(dir, dirName);
-            if (!headDir.exists()) {
-                headDir.mkdir();//创建文件夹
+        File appRootDir = new File(Environment.getExternalStorageDirectory(), "勘察宝");//根文件
+
+        if (!appRootDir.exists())//根文件不存在 创建一下
+            appRootDir.mkdir();
+
+     /*   File dir = new File(appRootDir, albumName);//站点文件夹 这里暂时不需要
+        //文件夹不存在就创建
+        if (!dir.exists())
+            dir.mkdir();*/
+
+        File newFile = new File(appRootDir, fileName + ".jpg");
+        int num = 1;
+        while (newFile.exists()) {
+            newFile = new File(appRootDir, fileName + "(" + num + ").jpg");
+            num++;//num加加
+        }
+
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(newFile);
+            /* Bitmap bitmap = BitmapFactory.decodeFile(sourceFilePath);//源路径*/
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            } else {
+                return IMAGE_DAMAGE;
             }
-            File file = new File(headDir, fileName);
-            if (file.exists()) {
-                fileName = "survey" + random.nextInt(Integer.MAX_VALUE) + ".jpg";
-                file = new File(dir, fileName);//如果图片存在了，就换个名字
-            }
-            FileOutputStream fileOutputStream = null;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return SAVE_FAIL;
+        } finally {
             try {
-                file.createNewFile();
-                fileOutputStream = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                fileOutputStream.flush();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                if (outputStream != null)
+                    outputStream.close();//关闭
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                if (fileOutputStream != null) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
-            return file.getAbsolutePath();
+
         }
-        return null;
+
+        //通知一下系统文件保存成功
+        Uri uri = Uri.fromFile(newFile);
+        MyApplication.getContext().sendBroadcast
+                (new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        sImagePath = newFile.getAbsolutePath();//绝对路径
+        return SAVE_OK;//保存成功
     }
 
 

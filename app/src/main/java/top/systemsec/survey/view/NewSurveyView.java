@@ -25,9 +25,11 @@ import java.util.List;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.adapter.ImageSelectAdapter;
+import top.systemsec.survey.base.NowUserInfo;
 import top.systemsec.survey.bean.ImageUploadState;
 import top.systemsec.survey.bean.SurveyBean;
 import top.systemsec.survey.custom_view.SpinnerView;
+import top.systemsec.survey.dialog.BottomDialog;
 
 public class NewSurveyView extends LinearLayout {
 
@@ -41,8 +43,8 @@ public class NewSurveyView extends LinearLayout {
     private TextView mLocText;
 
     private ScrollView mScrollView;//滚动view
-    private ViewGroup mNumberLinear;//编号
 
+    private EditText mNumberEdit;//编号edit
     private EditText mPointNameEdit;
     private EditText mDetailAddressEdit;
     private EditText mLongitude;
@@ -73,17 +75,24 @@ public class NewSurveyView extends LinearLayout {
     private RecyclerView mCloseShotRecyclerView;
     private RecyclerView mGpsImgRecyclerView;
     private RecyclerView mSceneImgRecyclerView;
+    private RecyclerView mOtherImgRecyclerView;
 
     /**
      * 备注信息
      */
     private EditText mRemarkEdit;
 
+    /**
+     * 底部对话框
+     */
+    private BottomDialog mBottomDialog;//底部对话框
+
     private ImageSelectAdapter mImageSelectAdapter;
     private ImageSelectAdapter mImageSelectAdapter1;
     private ImageSelectAdapter mImageSelectAdapter2;
     private ImageSelectAdapter mImageSelectAdapter3;
     private ImageSelectAdapter mImageSelectAdapter4;
+    private ImageSelectAdapter mImageSelectAdapter5;//第5个图片适配
 
     private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
 
@@ -101,9 +110,8 @@ public class NewSurveyView extends LinearLayout {
         mScrollView = findViewById(R.id.scrollView);//滚动View
 
         mLocText = findViewById(R.id.locText);
-        mNumberLinear = findViewById(R.id.numberLinear);//编号linear
-        mNumberLinear.setVisibility(GONE);//编号不可见
 
+        mNumberEdit = findViewById(R.id.numberEdit);//编码
         mPointNameEdit = findViewById(R.id.pointNameEdit);
         mDetailAddressEdit = findViewById(R.id.detailAddressEdit);
         mLongitude = findViewById(R.id.longitude);
@@ -128,8 +136,11 @@ public class NewSurveyView extends LinearLayout {
         mCloseShotRecyclerView = findViewById(R.id.closeShotRecyclerView);
         mGpsImgRecyclerView = findViewById(R.id.gpsImgRecyclerView);
         mSceneImgRecyclerView = findViewById(R.id.sceneImgRecyclerView);
+        mOtherImgRecyclerView = findViewById(R.id.otherImgRecyclerView);//其他相册
 
         mRemarkEdit = findViewById(R.id.remarkEdit);
+
+        mBottomDialog = new BottomDialog(getContext());//初始化一个底部dialog
     }
 
     /**
@@ -165,10 +176,17 @@ public class NewSurveyView extends LinearLayout {
         mOnGetWidthListener = onGetWidthListener;
     }
 
+    /**
+     * 初始化数据
+     *
+     * @param surveyBean
+     */
     public void initData(SurveyBean surveyBean) {
+        mNumberEdit.setText(surveyBean.getCode());//设置编号
+        if (!TextUtils.isEmpty(surveyBean.getCode()))
+            mNumberEdit.setSelection(surveyBean.getCode().length());//光标位置
+
         mPointNameEdit.setText(surveyBean.getPointName());//站点名称
-        if (!TextUtils.isEmpty(surveyBean.getPointName()))
-            mPointNameEdit.setSelection(surveyBean.getPointName().length());//光标位置
         mDetailAddressEdit.setText(surveyBean.getDetailAddress());//详细地址
         mLongitude.setText(surveyBean.getLongitude());//经度
         mLatitudeEdit.setText(surveyBean.getLatitude());//纬度
@@ -202,6 +220,7 @@ public class NewSurveyView extends LinearLayout {
      * 慎用
      */
     public void clearData() {
+        mNumberEdit.setText("");//清除编号
         mPoleHighEdit.setText("");//立杆高度
         mCrossArmNumEdit.setText("");//横臂数
         mFaceRecNumEdit.setText("");//人脸识别数
@@ -226,8 +245,8 @@ public class NewSurveyView extends LinearLayout {
      */
     public void initClickListener(OnClickListener onClickListener) {
         mBackImage.setOnClickListener(onClickListener);
-
         mLocText.setOnClickListener(onClickListener);//定位
+        mBottomDialog.initClickListener(onClickListener);//初始化点击监听
     }
 
     /**
@@ -294,6 +313,15 @@ public class NewSurveyView extends LinearLayout {
     }
 
     /**
+     * 初始化其他图片适配器
+     */
+    public void initImageAdapter5(List<ImageUploadState> imagePaths, int width) {
+        mImageSelectAdapter5 = new ImageSelectAdapter(imagePaths, getContext(), "其他图片", 5, 20, width);
+        mOtherImgRecyclerView.setAdapter(mImageSelectAdapter5);
+        mOtherImgRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+    }
+
+    /**
      * 初始化添加图片的监听
      *
      * @param onAddImageListener
@@ -304,6 +332,7 @@ public class NewSurveyView extends LinearLayout {
         mImageSelectAdapter2.setOnAddImageListener(onAddImageListener);
         mImageSelectAdapter3.setOnAddImageListener(onAddImageListener);
         mImageSelectAdapter4.setOnAddImageListener(onAddImageListener);
+        mImageSelectAdapter5.setOnAddImageListener(onAddImageListener);
     }
 
     /**
@@ -315,6 +344,7 @@ public class NewSurveyView extends LinearLayout {
         mImageSelectAdapter2.setOnImageClickListener(onImageClickListener);
         mImageSelectAdapter3.setOnImageClickListener(onImageClickListener);
         mImageSelectAdapter4.setOnImageClickListener(onImageClickListener);
+        mImageSelectAdapter5.setOnImageClickListener(onImageClickListener);
     }
 
     public void notifyImgAdapter() {
@@ -338,6 +368,13 @@ public class NewSurveyView extends LinearLayout {
     }
 
     /**
+     * 唤醒其他相册的数据更新
+     */
+    public void notifyImgAdapter5() {
+        mImageSelectAdapter5.notifyDataSetChanged();//唤醒数据更新
+    }
+
+    /**
      * 设置经度
      */
     public void setLongitude(String longitude) {
@@ -354,9 +391,22 @@ public class NewSurveyView extends LinearLayout {
     }
 
     /**
+     * 设置地址
+     */
+    public void setAddress(String address) {
+        mDetailAddressEdit.setText(address);
+    }
+
+    /**
      * 得到信息
      */
     public SurveyBean getSurveyInfo() {
+
+        String code = mNumberEdit.getText().toString();//编号
+        if (TextUtils.isEmpty(code)) {
+            Toast.makeText(getContext(), "编号不能为空", Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
         String pointName = mPointNameEdit.getText().toString();//点位名称
         if (TextUtils.isEmpty(pointName)) {
@@ -382,17 +432,17 @@ public class NewSurveyView extends LinearLayout {
             return null;
         }
 
-        String street = mStreetSpinner.getNowStr();
+        String street = mStreetEdit.getText().toString();//街道信息
 
         if (TextUtils.isEmpty(street)) {//街道为空
-            Toast.makeText(getContext(), "请选择街道", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "请输入街道", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        String police = mPoliceSpinner.getNowStr();
+        String police = mPoliceEdit.getText().toString();//警局
 
         if (TextUtils.isEmpty(police)) {//街道为空
-            Toast.makeText(getContext(), "请选择警局", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "请输入警局", Toast.LENGTH_SHORT).show();
             return null;
         }
 
@@ -467,6 +517,9 @@ public class NewSurveyView extends LinearLayout {
         List<ImageUploadState> list4 = getImageUploadState(mImageSelectAdapter4);
         if (list4 == null)
             return null;
+        List<ImageUploadState> list5 = getImageUploadState(mImageSelectAdapter5.getImagePaths());
+        if (list5 == null)
+            return null;
 
 
         String remark = mRemarkEdit.getText().toString();
@@ -477,11 +530,11 @@ public class NewSurveyView extends LinearLayout {
         imageList.addAll(list2);
         imageList.addAll(list3);
         imageList.addAll(list4);
+        imageList.addAll(list5);//将第五个图片列表填进去
 
-        SurveyBean surveyBean = new SurveyBean(
-                pointName, detailAddress, longitude, latitude, street, police,//点位信息
+        SurveyBean surveyBean = new SurveyBean(code, pointName, detailAddress, longitude, latitude, street, police,//点位信息
                 installType, poleHigh, crossArmNum, dir1, dir2, faceRecNum, faceLightNum, carRecNum, globalNum,//摄像机信息
-                imageList, remark);//备注
+                imageList, remark, NowUserInfo.getUserBean().getId());//备注
 
         return surveyBean;
     }
@@ -508,6 +561,19 @@ public class NewSurveyView extends LinearLayout {
                 mImageSelectAdapter2.notifyDataSetChanged();
                 mImageSelectAdapter3.notifyDataSetChanged();
                 mImageSelectAdapter4.notifyDataSetChanged();//都唤醒一下
+                mImageSelectAdapter5.notifyDataSetChanged();//都唤醒一下
+                return null;
+            }
+        }
+        return list;
+    }
+
+    private List<ImageUploadState> getImageUploadState(List<ImageUploadState> list) {
+        for (ImageUploadState imageState : list) {
+            File file = new File(imageState.getImagePath());
+            if (!file.exists()) {
+                Toast.makeText(getContext(), "请清除照破损图片", Toast.LENGTH_SHORT).show();
+                mImageSelectAdapter5.notifyDataSetChanged();//唤醒一下
                 return null;
             }
         }
@@ -525,11 +591,28 @@ public class NewSurveyView extends LinearLayout {
     }
 
     /**
-     * 滑动到顶部
+     * 滚动到顶部
      */
     public void scrollTop() {
+        mPointNameEdit.requestFocus();//请求焦点
+        mNumberEdit.setText("");//文本为空
         mScrollView.smoothScrollTo(0, 0);
     }
+
+    /**
+     * 弹出底部弹窗
+     */
+    public void popBottomDialog() {
+        mBottomDialog.show();
+    }
+
+    /**
+     * 隐藏底部弹窗
+     */
+    public void hideBottomDialog() {
+        mBottomDialog.dismiss();//底部弹窗消失
+    }
+
 
     /**
      * 得到站点名称

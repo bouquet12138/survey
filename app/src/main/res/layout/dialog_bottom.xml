@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingBottom="10dp"
+    android:paddingRight="15dp">
+
+    <TextView
+        android:id="@+id/continuousPhotoBt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_bt_up"
+        android:gravity="center"
+        android:padding="13dp"
+        android:text="连续拍照"
+        android:textColor="@color/colorPrimary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/ordinaryPhotoBt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_bt_middle"
+        android:gravity="center"
+        android:padding="13dp"
+        android:text="普通拍照"
+        android:textColor="@color/colorPrimary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/albumBt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_bt_down"
+        android:gravity="center"
+        android:padding="13dp"
+        android:text="相册"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/cancelBt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/selector_bt_bottom"
+        android:gravity="center"
+        android:padding="13dp"
+        android:text="取消"
+        android:textColor="#EE6767" />
+
+</LinearLayout>

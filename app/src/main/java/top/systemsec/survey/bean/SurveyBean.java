@@ -29,6 +29,8 @@ public class SurveyBean extends LitePalSupport {
     /**
      * 点位信息
      */
+
+    private String code;//站点编号
     private String pointName;//站点名
     private String detailAddress;//详细地址
     private String longitude;//经度
@@ -68,12 +70,15 @@ public class SurveyBean extends LitePalSupport {
      */
     private String submitTime;//提交时间
 
+    private int useId;
+
     public SurveyBean() {
     }
 
-    public SurveyBean(String pointName, String detailAddress, String longitude, String latitude, String street, String police,
+    public SurveyBean(String code, String pointName, String detailAddress, String longitude, String latitude, String street, String police,
                       int cameraInstallType, float poleHigh, int crossArmNum, String dir1, String dir2,
-                      int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum, List<ImageUploadState> imgList, String remark) {
+                      int faceRecNum, int faceLightNum, int carNumRecNum, int globalNum, List<ImageUploadState> imgList, String remark, int useId) {
+        this.code = code;//站点编号
         this.pointName = pointName;
         this.detailAddress = detailAddress;
         this.longitude = longitude;
@@ -95,6 +100,16 @@ public class SurveyBean extends LitePalSupport {
         Log.d(TAG, "SurveyBean: " + imgInfo);
 
         this.remark = remark;
+        this.useId = useId;//记录一下用户id
+    }
+
+    /**
+     * 站点编号
+     *
+     * @return
+     */
+    public String getCode() {
+        return code;
     }
 
     public String getPointName() {

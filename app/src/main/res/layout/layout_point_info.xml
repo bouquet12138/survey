@@ -42,8 +42,8 @@
             style="@style/style_point_info_text"
             android:text="编号" />
 
-        <TextView
-            android:id="@+id/numberText"
+        <EditText
+            android:id="@+id/numberEdit"
             style="@style/style_point_info_edit" />
 
     </LinearLayout>

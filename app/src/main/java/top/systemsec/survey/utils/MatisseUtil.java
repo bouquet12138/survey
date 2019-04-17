@@ -1,11 +1,9 @@
 package top.systemsec.survey.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 
-import com.bumptech.glide.load.engine.Resource;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.filter.Filter;
@@ -24,7 +22,6 @@ public class MatisseUtil {
         Matisse.from(activity)
                 .choose(MimeType.ofImage(), false)
                 .countable(true)
-                .capture(true)
                 .captureStrategy(
                         new CaptureStrategy(true, "top.systemsec.survey.fileprovider"))
                 .maxSelectable(maxImgNum)

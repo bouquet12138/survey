@@ -8,20 +8,20 @@ import top.systemsec.survey.base.IMVPBaseView;
 import top.systemsec.survey.bean.ImageUploadState;
 
 public interface INewSurveyView extends IMVPBaseView {
-
-    /**
+/*
+    *//**
      * 初始化街道
      *
      * @param streets
-     */
+     *//*
     void initStreet(String[] streets);
 
-    /**
+    *//**
      * 初始化街道
      *
      * @param polices
-     */
-    void initPolice(String[] polices);
+     *//*
+    void initPolice(String[] polices);*/
 
     /**
      * 得到源

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <litepal>
     <dbname value="survey_db"></dbname>
-    <version value="1"></version>
+    <version value="3"></version>
 
     <list>
         <mapping class="top.systemsec.survey.bean.SurveyBean"></mapping>

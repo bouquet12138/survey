@@ -1,12 +1,10 @@
 package top.systemsec.survey.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.BaseActivity;

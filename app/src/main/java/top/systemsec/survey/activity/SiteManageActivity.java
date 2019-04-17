@@ -66,9 +66,7 @@ public class SiteManageActivity extends MVPBaseActivity implements ISiteManageVi
      */
     private void initListener() {
         mBackImage.setOnClickListener(this);
-
         mMyEdit.setOnTextChangeListener((str) -> mSiteManagePresenter.search());//搜索一下
-
     }
 
     @Override

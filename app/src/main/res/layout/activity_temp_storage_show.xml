@@ -60,7 +60,7 @@
 
 
                 <Button
-                    android:id="@+id/cancelBt"
+                    android:id="@+id/myCancelBt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"

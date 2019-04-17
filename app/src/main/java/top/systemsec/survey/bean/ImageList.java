@@ -10,6 +10,7 @@ public class ImageList {
     private List<ImageUploadState> mImagePaths2 = new ArrayList<>();
     private List<ImageUploadState> mImagePaths3 = new ArrayList<>();
     private List<ImageUploadState> mImagePaths4 = new ArrayList<>();
+    private List<ImageUploadState> mImagePaths5 = new ArrayList<>();
 
     public ImageList(List<ImageUploadState> imageList) {
 
@@ -30,6 +31,9 @@ public class ImageList {
                         break;
                     case 4:
                         mImagePaths4.add(image);//现场画面照
+                        break;
+                    case 5:
+                        mImagePaths5.add(image);//其他图片
                         break;
                 }
             }
@@ -126,6 +130,24 @@ public class ImageList {
         return str;
     }
 
+    /**
+     * 得到第五组图片的字符串
+     *
+     * @return
+     */
+    public String getImageUrlStr5() {
+        String str = "[";
+
+        for (int i = 0; i < mImagePaths5.size(); i++) {
+            str += "\"" + mImagePaths5.get(i).getImageUrl() + "\"";
+            if (i != mImagePaths5.size() - 1)
+                str += ",";
+        }
+
+        str += "]";
+        return str;
+    }
+
     public List<ImageUploadState> getImagePaths() {
         return mImagePaths;
     }
@@ -144,5 +166,9 @@ public class ImageList {
 
     public List<ImageUploadState> getImagePaths4() {
         return mImagePaths4;
+    }
+
+    public List<ImageUploadState> getImagePaths5() {
+        return mImagePaths5;
     }
 }
