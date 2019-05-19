@@ -2,6 +2,7 @@ package top.systemsec.survey.presenter;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.File;
 import java.util.List;
@@ -14,6 +15,7 @@ import top.systemsec.survey.mobel.NewSurveyModel;
 import top.systemsec.survey.view.INewSurveyView;
 
 public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
+    private static final String TAG = "NewSurveyPresenter";
 
     private final int STREET_COMPLETE = 0;//街道响应完成
 
@@ -45,7 +47,7 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
                     break;
                 case IMAGE_SUCCESS:
                     String imageUrl = (String) msg.obj;
-
+                    Log.d(TAG, "handleMessage: " + imageUrl);
                     mImageUploadStates.get(mNowUploadIndex).setImageUrl(imageUrl);//设置图片Url
                     mNowUploadIndex++;
                     if (mNowUploadIndex >= mImageUploadStates.size()) {
@@ -154,6 +156,7 @@ public class NewSurveyPresenter extends MVPBasePresenter<INewSurveyView> {
         if (!isViewAttached())
             return;
         if (surveyBean != null) {
+
             surveyBean.setSaveTime();//设置保存时间
             mNewSurveyModel.saveSurveyToLocal(surveyBean);//保存一下
             getView().hideLoading();//隐藏进度框

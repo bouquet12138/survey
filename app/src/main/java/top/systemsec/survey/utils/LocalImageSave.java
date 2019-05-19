@@ -3,13 +3,16 @@ package top.systemsec.survey.utils;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,8 +43,9 @@ public class LocalImageSave {
 
     private static final String TAG = "LocalImageSave";
 
+
     //用来存储图片并返回本地存储的路径 在app文件件夹下存储，
-    public static int saveImage(Bitmap bitmap, String albumName, String fileName) {
+    public static int saveImage(Bitmap bitmap, String albumName, String fileName, int byteSize) {
         if (bitmap == null)
             return SAVE_FAIL;
         String state = Environment.getExternalStorageState();
@@ -50,16 +54,21 @@ public class LocalImageSave {
             return STORAGE_CARD_DISABLED;//储存卡不可用
         }
 
+        //90度旋转
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            Matrix matrix = new Matrix();
+            matrix.setRotate(90, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);//旋转90
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        }
 
-        File appRootDir = new File(Environment.getExternalStorageDirectory(), "勘察宝");//根文件
-
+        File appRootDir = new File(Environment.getExternalStorageDirectory(), "雪亮宝");//根文件
         if (!appRootDir.exists())//根文件不存在 创建一下
             appRootDir.mkdir();
 
-     /*   File dir = new File(appRootDir, albumName);//站点文件夹 这里暂时不需要
-        //文件夹不存在就创建
-        if (!dir.exists())
-            dir.mkdir();*/
+        int quality = 100;//质量为100
+        if (byteSize > 1024 * 1024 * 3) {
+            quality = 50;//质量降低
+        }
 
         File newFile = new File(appRootDir, fileName + ".jpg");
         int num = 1;
@@ -71,9 +80,8 @@ public class LocalImageSave {
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(newFile);
-            /* Bitmap bitmap = BitmapFactory.decodeFile(sourceFilePath);//源路径*/
             if (bitmap != null) {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             } else {
                 return IMAGE_DAMAGE;
             }
@@ -95,6 +103,9 @@ public class LocalImageSave {
         MyApplication.getContext().sendBroadcast
                 (new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
         sImagePath = newFile.getAbsolutePath();//绝对路径
+
+        Log.d(TAG, "saveImage: " + "宽 " + bitmap.getWidth() + " 高 " + bitmap.getHeight());
+
         return SAVE_OK;//保存成功
     }
 

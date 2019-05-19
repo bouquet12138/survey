@@ -196,6 +196,9 @@ public abstract class SurveyActivity extends SurveyPermissionActivity implements
      */
     protected void addImage(List<String> sourcePathList) {
 
+        if (sourcePathList == null || sourcePathList.size() == 0)
+            return;
+
         List<ImageUploadState> pathList = new ArrayList<>();
 
         for (String imagePath : sourcePathList) {

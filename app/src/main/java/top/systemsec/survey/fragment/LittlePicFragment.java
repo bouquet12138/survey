@@ -38,6 +38,9 @@ public class LittlePicFragment extends Fragment {
     private PhotoView mImgView;
 
     private String mImageHead;//后台头
+    private String mPointName;
+    private String mTitleName;
+    private int mIndex;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

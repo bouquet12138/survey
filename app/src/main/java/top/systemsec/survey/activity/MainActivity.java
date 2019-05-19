@@ -11,7 +11,7 @@ import top.systemsec.survey.base.BaseActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    private ViewGroup mNewSurvey;
+    ViewGroup mNewSurvey;//备注
     private ViewGroup mSaveInfo;
     private ViewGroup mSiteManage;
 

@@ -43,10 +43,18 @@
             <RadioButton
                 android:id="@+id/wallRadio"
                 android:layout_width="0dp"
-                android:clickable="false"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:clickable="false"
                 android:text="壁挂安装" />
+
+            <RadioButton
+                android:id="@+id/borrowRod"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="false"
+                android:text="借杆安装" />
 
         </RadioGroup>
 

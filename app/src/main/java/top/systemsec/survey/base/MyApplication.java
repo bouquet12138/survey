@@ -5,6 +5,8 @@ import android.content.Context;
 
 import org.litepal.LitePal;
 
+import top.systemsec.survey.utils.CrashHandler;
+
 /**
  * Created by xiaohan on 2017/11/16.
  */
@@ -19,6 +21,7 @@ public class MyApplication extends Application {
         super.onCreate();
         context = getApplicationContext();
         LitePal.initialize(this);//初始化
+        CrashHandler.getInstance().init(this);
     }
 
     public static Context getContext() {

@@ -46,6 +46,13 @@
                 android:layout_weight="1"
                 android:text="壁挂安装" />
 
+            <RadioButton
+                android:id="@+id/borrowRod"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="借杆安装" />
+
         </RadioGroup>
 
     </LinearLayout>
@@ -120,7 +127,8 @@
         <EditText
             android:id="@+id/faceRecNumEdit"
             style="@style/style_camera_info_edit"
-            android:inputType="number" />
+            android:inputType="number"
+            android:text="1"/>
 
         <TextView
             android:layout_width="15dp"
@@ -135,7 +143,8 @@
         <EditText
             android:id="@+id/faceLightNumEdit"
             style="@style/style_camera_info_edit"
-            android:inputType="number" />
+            android:inputType="number"
+            android:text="1" />
 
         <TextView
             android:layout_width="15dp"
@@ -156,7 +165,8 @@
         <EditText
             android:id="@+id/carNumRecNumEdit"
             style="@style/style_camera_info_edit"
-            android:inputType="number" />
+            android:inputType="number"
+            android:text="1" />
 
         <TextView
             android:layout_width="15dp"
@@ -171,7 +181,8 @@
         <EditText
             android:id="@+id/globalNumEdit"
             style="@style/style_camera_info_edit"
-            android:inputType="number" />
+            android:inputType="number"
+            android:text="1" />
 
         <TextView
             android:layout_width="15dp"

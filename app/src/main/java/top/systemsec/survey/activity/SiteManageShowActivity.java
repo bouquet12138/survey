@@ -43,6 +43,8 @@ public class SiteManageShowActivity extends BaseActivity {
 
     private RadioButton mPoleRadio;
     private RadioButton mWallRadio;
+    private RadioButton mBorrowRod;//借杆安装
+
     private TextView mPoleHighEdit;
     private TextView mCrossArmNumEdit;
     private TextView mDirEdit1;
@@ -99,6 +101,8 @@ public class SiteManageShowActivity extends BaseActivity {
 
         mPoleRadio = findViewById(R.id.poleRadio);
         mWallRadio = findViewById(R.id.wallRadio);
+        mBorrowRod = findViewById(R.id.borrowRod);//借杆安装
+
         mPoleHighEdit = findViewById(R.id.poleHighEdit);
         mCrossArmNumEdit = findViewById(R.id.crossArmNumEdit);
         mDirEdit1 = findViewById(R.id.dirEdit1);
@@ -185,11 +189,15 @@ public class SiteManageShowActivity extends BaseActivity {
 
         if (installType == 2)
             mWallRadio.setChecked(true);//选中壁挂安装
+        else if (installType == 3)
+            mBorrowRod.setChecked(true);//选中借杆安装
 
         mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
         mCrossArmNumEdit.setText(surveyBean.getCrossArmNum() + "");//横臂数
+
         mDirEdit1.setText(surveyBean.getDir1());
         mDirEdit2.setText(surveyBean.getDir2());
+
         mFaceRecNumEdit.setText(surveyBean.getFaceRecNum() + "");//人脸识别数
         mFaceLightNumEdit.setText(surveyBean.getFaceLightNum() + "");//人脸补光灯数
 

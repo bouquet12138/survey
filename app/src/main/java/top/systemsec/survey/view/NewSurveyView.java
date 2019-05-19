@@ -57,6 +57,7 @@ public class NewSurveyView extends LinearLayout {
      */
     private RadioButton mPoleRadio;
     private RadioButton mWallRadio;
+    private RadioButton mBorrowRod;//借杆安装
 
     private EditText mPoleHighEdit;
     private EditText mCrossArmNumEdit;
@@ -121,6 +122,7 @@ public class NewSurveyView extends LinearLayout {
 
         mPoleRadio = findViewById(R.id.poleRadio);//立杆安装
         mWallRadio = findViewById(R.id.wallRadio);//壁挂安装
+        mBorrowRod = findViewById(R.id.borrowRod);//借杆安装
 
         mPoleHighEdit = findViewById(R.id.poleHighEdit);
         mCrossArmNumEdit = findViewById(R.id.crossArmNumEdit);
@@ -198,12 +200,14 @@ public class NewSurveyView extends LinearLayout {
 
         if (installType == 2)
             mWallRadio.setChecked(true);//选中壁挂安装
+        else if (installType == 3)
+            mBorrowRod.setChecked(true);//借杆安装
 
         mPoleHighEdit.setText(surveyBean.getPoleHigh() + "");
         mCrossArmNumEdit.setText(surveyBean.getCrossArmNum() + "");//横臂数
 
-
         mDirEdit1.setText(surveyBean.getDir1());
+
         mDirEdit2.setText(surveyBean.getDir2());
 
         mFaceRecNumEdit.setText(surveyBean.getFaceRecNum() + "");//人脸识别数
@@ -449,6 +453,8 @@ public class NewSurveyView extends LinearLayout {
         int installType = 1;
         if (mWallRadio.isChecked())
             installType = 2;
+        else if (mBorrowRod.isChecked())//借杆安装
+            installType = 3;
 
         String poleHighStr = mPoleHighEdit.getText().toString();
         float poleHigh;//立杆
@@ -477,26 +483,27 @@ public class NewSurveyView extends LinearLayout {
         String dir1 = mDirEdit1.getText().toString();
         String dir2 = mDirEdit2.getText().toString();
 
+
         String faceRecNumStr = mFaceRecNumEdit.getText().toString();
-        int faceRecNum = 0;//人脸识别数
+        int faceRecNum = 1;//人脸识别数
         if (!TextUtils.isEmpty(faceRecNumStr)) {
             faceRecNum = Integer.parseInt(faceRecNumStr);
         }
 
         String faceLightNumStr = mFaceLightNumEdit.getText().toString();
-        int faceLightNum = 0;//人脸补光灯数
+        int faceLightNum = 1;//人脸补光灯数
         if (!TextUtils.isEmpty(faceLightNumStr)) {
             faceLightNum = Integer.parseInt(faceLightNumStr);
         }
 
         String carRecNumStr = mCarNumRecNumEdit.getText().toString();
-        int carRecNum = 0;//车牌识别
+        int carRecNum = 1;//车牌识别
         if (!TextUtils.isEmpty(carRecNumStr)) {
             carRecNum = Integer.parseInt(carRecNumStr);
         }
 
         String globalNumStr = mGlobalNumEdit.getText().toString();
-        int globalNum = 0;//环球监控头
+        int globalNum = 1;//环球监控头
         if (!TextUtils.isEmpty(globalNumStr)) {
             globalNum = Integer.parseInt(globalNumStr);
         }
@@ -594,8 +601,8 @@ public class NewSurveyView extends LinearLayout {
      * 滚动到顶部
      */
     public void scrollTop() {
-        mPointNameEdit.requestFocus();//请求焦点
         mNumberEdit.setText("");//文本为空
+        mNumberEdit.requestFocus();//编号请求焦点
         mScrollView.smoothScrollTo(0, 0);
     }
 

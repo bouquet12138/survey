@@ -136,8 +136,18 @@ public abstract class SurveyPermissionActivity extends MVPBaseActivity {
                     Toast.makeText(this, "用户拒绝权限不能获取定位", Toast.LENGTH_SHORT).show();
                 break;
             case PERMISSIONS_CAMERA:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) // 权限被用户同意。执形我们想要的操作
+                if (grantResults.length > 0){
+                    // 权限被用户同意。执形我们想要的操作
+
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(this, "用户拒绝权限无法打开相机", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+
                     openCamera();//打开相机
+                }
                 else
                     Toast.makeText(this, "用户拒绝权限不能打开相机", Toast.LENGTH_SHORT).show();
                 break;

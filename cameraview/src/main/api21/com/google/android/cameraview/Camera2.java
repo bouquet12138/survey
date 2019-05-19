@@ -473,7 +473,7 @@ class Camera2 extends CameraViewImpl {
         Size pictureSize = null;
         SortedSet<Size> pictureSizeS = mPictureSizes.sizes(mAspectRatio);
         Log.e(TAG, "prepareImageReader mAspectRatio =" + mAspectRatio.toString());
-        Log.e(TAG, "prepareImageReader pictureSizeS =" + pictureSizeS.toString());
+//        Log.e(TAG, "prepareImageReader pictureSizeS =" + pictureSizeS.toString());
         if (mSettingPictureSize == null) {
             pictureSize = pictureSizeS.last(); //选择最大的Size
         } else {
@@ -732,6 +732,8 @@ class Camera2 extends CameraViewImpl {
             mCaptureCallback.setState(PictureCaptureCallback.STATE_PREVIEW);
         } catch (CameraAccessException e) {
             Log.e(TAG, "Failed to restart camera preview.", e);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "空指针异常", e);
         }
     }
 

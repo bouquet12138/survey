@@ -1,11 +1,9 @@
 package top.systemsec.survey.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+
 
 import java.io.File;
 import java.util.List;
@@ -25,9 +20,10 @@ import top.systemsec.survey.R;
 import top.systemsec.survey.base.ServerInfo;
 import top.systemsec.survey.bean.ImageUploadState;
 
-import static android.support.constraint.Constraints.TAG;
 
 public class ImageFixAdapter extends RecyclerView.Adapter<ImageFixAdapter.MyViewHolder> {
+
+    private static final String TAG = "ImageFixAdapter";
 
     private List<ImageUploadState> mImagePaths;//图片路径
     private String mImageHead;//图片头
@@ -76,12 +72,13 @@ public class ImageFixAdapter extends RecyclerView.Adapter<ImageFixAdapter.MyView
 
         File file = new File(imagePath);
 
-        if (file.exists())
+        if (file.exists()) {
             Glide.with(mContext).load(imagePath).error(R.drawable.image_error)
                     .into(holder.imageView);//设置图片
-        else {
-            String imageUrl = ServerInfo.SERVER_IP + "/Exploit/upload/thu" + mImagePaths.get(position).getImageUrl();//图片路径
-            Log.d(TAG, "loadFromWeb: imagePth " + imagePath);
+            Log.d(TAG, "onBindViewHolder: 图片存在 ");
+        } else {
+            String imageUrl = ServerInfo.SERVER_IP + "/Exploit/upload/thu/thu" + mImagePaths.get(position).getImageUrl();//图片路径
+            Log.d(TAG, "loadFromWeb: imagePth " + imageUrl);
             Glide.with(mContext).load(imageUrl).placeholder(R.drawable.image_loading).error(R.drawable.image_error_big).into(holder.imageView);//设置图片
         }
 

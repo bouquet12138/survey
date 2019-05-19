@@ -52,6 +52,7 @@ public class TempStorageShowPresenter extends MVPBasePresenter<ITempStorageShowV
                     break;
                 case IMAGE_SUCCESS:
                     String imageUrl = (String) msg.obj;
+                    Log.d(TAG, "handleMessage: " + imageUrl);
                     mImageUploadStates.get(mNowUploadIndex).setImageUrl(imageUrl);//设置图片Url
                     mNowUploadIndex++;
                     if (mNowUploadIndex >= mImageUploadStates.size()) {

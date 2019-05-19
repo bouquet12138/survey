@@ -1,15 +1,20 @@
 package top.systemsec.survey.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
+import android.graphics.Point;
+import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.SoundPool;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,8 +33,6 @@ import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import top.systemsec.survey.R;
 import top.systemsec.survey.base.NowUserInfo;
@@ -42,8 +45,6 @@ public class CameraActivity extends AppCompatActivity {
     private String mPointName;//站点名
     private int mMaxImageNum;//最大图片数
 
-    private int mAddImgNum;//添加图片数
-
     private List<String> mImageList = new ArrayList<>();//图片列表
     private CameraView mCamera;
     private Button mTakePhotoBt;
@@ -51,40 +52,12 @@ public class CameraActivity extends AppCompatActivity {
     private View mBlackView;
     private ValueAnimator mValueAnimator;
 
-    private static final int SAVE_OK = 0;//保存成功
-    private static final int STORAGE_CARD_DISABLED = 1;//sd卡错误
-    private static final int SAVE_FAIL = 2;//保存失败
+    private int mAddImg = 0;
 
-    private byte[] mData;
+    private float mScreenWidth;
+    private float mScreenHeight;
 
-    private Handler mHandler = new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case SAVE_OK:
-                    Toast.makeText(CameraActivity.this, "图片保存成功", Toast.LENGTH_SHORT).show();
-                    String imagePath = LocalImageSave.sImagePath;
-                    if (mImageList.size() < mMaxImageNum)//只有小于才能添加
-                        mImageList.add(imagePath);//添加图片
-                    if (mImageList.size() >= mMaxImageNum) //大于等于最大图片数
-                        returnResult();//将结果返回
-                    break;
-                case STORAGE_CARD_DISABLED:
-                    Toast.makeText(CameraActivity.this, "内存空间不足", Toast.LENGTH_SHORT).show();
-                    mAddImgNum--;
-                    mTakePhotoBt.setEnabled(true);
-                    break;
-                case SAVE_FAIL:
-                    Toast.makeText(CameraActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
-                    mAddImgNum--;
-                    mTakePhotoBt.setEnabled(true);
-                    break;
-            }
-        }
-    };
-    private ExecutorService mSingleThreadExecutor;
-    private Runnable mRunnable;
+    private Toast mSuccessToast;
 
 
     @Override
@@ -92,47 +65,19 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//全屏一下
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        mScreenWidth = dm.widthPixels;
+        mScreenHeight = dm.heightPixels;
+
+        Log.d(TAG, "onCreate: " + mScreenWidth + " screenHeight " + mScreenHeight);
+
         initView();
         initAnim();
         initData();
-        initThread();
         initListener();
     }
 
-    /**
-     * 初始化线程
-     */
-    private void initThread() {
-        //单线程池
-        mSingleThreadExecutor = Executors.newFixedThreadPool(3);
-
-        mRunnable = () -> {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(mData, 0, mData.length);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
-            String fileName;
-
-            if (TextUtils.isEmpty(mPointName)) {
-                fileName = NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());//文件名
-            } else {
-                fileName = mPointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());//文件名
-            }
-
-            Log.d(TAG, "captureSuccess: fileName " + fileName);
-            int state = LocalImageSave.saveImage(bitmap, mPointName, fileName);
-            switch (state) {
-                case LocalImageSave.STORAGE_CARD_DISABLED://SD卡错误
-                    mHandler.sendEmptyMessage(STORAGE_CARD_DISABLED);
-                    break;
-                case LocalImageSave.SAVE_OK:
-                    mHandler.sendEmptyMessage(SAVE_OK);//保存成功
-                    break;
-                default:
-                    mHandler.sendEmptyMessage(SAVE_FAIL);//保存失败
-                    break;
-            }
-        };
-
-    }
 
     /**
      * 初始化动画
@@ -155,6 +100,8 @@ public class CameraActivity extends AppCompatActivity {
         mTakePhotoBt = findViewById(R.id.takePhotoBt);
         mBackImg = findViewById(R.id.backImg);
         mBlackView = findViewById(R.id.blackView);
+
+        mSuccessToast = Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT);
     }
 
     /**
@@ -172,13 +119,12 @@ public class CameraActivity extends AppCompatActivity {
      */
     private void initListener() {
         mTakePhotoBt.setOnClickListener((v) -> {
-            mAddImgNum++;
-            mBlackView.setVisibility(View.VISIBLE);//可见
-            mValueAnimator.start();
-            mCamera.takePicture();//拍照
-
-            if (mAddImgNum >= mMaxImageNum)
-                mTakePhotoBt.setEnabled(false);//禁用掉
+            if (mAddImg < mMaxImageNum) {
+                mBlackView.setVisibility(View.VISIBLE);//可见
+                mValueAnimator.start();
+                mCamera.takePicture();//拍照
+                mTakePhotoBt.setEnabled(false);//不可用
+            }
         });
 
         mBackImg.setOnClickListener((v) -> {
@@ -189,9 +135,16 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onCameraOpened(CameraView cameraView) {
                 super.onCameraOpened(cameraView);
-                mCamera.setAspectRatio(AspectRatio.of(1632, 3264));
-                mCamera.setPictureSize(1632, 3264);
+                Log.d(TAG, "onCameraOpened: " + mScreenHeight / mScreenWidth);
+
+                try {
+                    mCamera.setAspectRatio(AspectRatio.of(1920, 1080));
+                    mCamera.setPictureSize(1920, 1080);
+                } catch (UnsupportedOperationException e) {
+                } catch (NullPointerException e) {
+                }
                 mCamera.setAutoFocus(true);
+
             }
 
             @Override
@@ -202,8 +155,42 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onPictureTaken(CameraView cameraView, byte[] data) {
                 super.onPictureTaken(cameraView, data);
-                mData = data;
-                mSingleThreadExecutor.execute(mRunnable);//执行一下
+                Log.d(TAG, "onPictureTaken: " + data.length);
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");//年月日时分秒
+                String fileName;
+
+                if (TextUtils.isEmpty(mPointName)) {
+                    fileName = NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());//文件名
+                } else {
+                    fileName = mPointName + "_" + NowUserInfo.getUserBean().getName() + "_" + simpleDateFormat.format(new Date());//文件名
+                }
+
+                int state = LocalImageSave.saveImage(bitmap, mPointName, fileName, data.length);
+                switch (state) {
+                    case LocalImageSave.STORAGE_CARD_DISABLED://SD卡错误
+                        Toast.makeText(CameraActivity.this, "SD卡错误", Toast.LENGTH_SHORT).show();
+                        mTakePhotoBt.setEnabled(true);//可用
+                        break;
+                    case LocalImageSave.SAVE_OK:
+                        mSuccessToast.show();//展示
+                        String imagePath = LocalImageSave.sImagePath;
+                        if (mImageList.size() < mMaxImageNum)//只有小于才能添加
+                            mImageList.add(imagePath);//添加图片
+
+                        if (mImageList.size() >= mMaxImageNum) //大于等于最大图片数
+                            returnResult();//将结果返回
+                        else {
+                            mTakePhotoBt.setEnabled(true);//保存完成才启用
+                        }
+                        break;
+                    default:
+                        Toast.makeText(CameraActivity.this, "内存空间不足", Toast.LENGTH_SHORT).show();
+                        mTakePhotoBt.setEnabled(true);//可用
+                        break;
+                }
+
             }
         });
 
@@ -241,9 +228,10 @@ public class CameraActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
     @Override
     protected void onDestroy() {
-        mSingleThreadExecutor.shutdown();
+        mSuccessToast.cancel();//取消
         super.onDestroy();
     }
 }

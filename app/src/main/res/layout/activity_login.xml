@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:hint="请输入手机号"
+        android:maxLength="11"
         android:inputType="number"
         android:paddingBottom="20dp"
         android:textColorHint="#ccc"

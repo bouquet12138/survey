@@ -9,10 +9,12 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -51,8 +53,21 @@ public class PictureViewActivity extends BaseActivity {
         setContentView(R.layout.activity_picture_view);
         initData();
         initView();
+        initSize();
         initAdapter();
         initListener();
+    }
+
+    /**
+     * 初始化尺寸
+     */
+    private void initSize() {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int screenWidth = dm.widthPixels;
+        int screenHeight = dm.heightPixels;
+
+        Log.d(TAG, "initSize: " + screenWidth + "  " + screenHeight);
+        //Toast.makeText(this, "宽 " + screenWidth + " 高 " + screenHeight, Toast.LENGTH_SHORT).show();
     }
 
     /**

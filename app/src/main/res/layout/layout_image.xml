@@ -126,7 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
-        android:text="其他相册" />
+        android:text="其他" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/otherImgRecyclerView"
